@@ -24,6 +24,11 @@ class AppAssets {
   static const petMaster      = '$_base/pet/kabau.png';
   static const petDefault     = '$_base/pet/default.png';
   static const petBurung      = '$_base/pet/burung.png';
+  static const petOrangUtanAnak   = '$_base/pet/orang utan anak no bg.png';
+  static const petOrangUtanRemaja = '$_base/pet/orang utan remaja no bg.png';
+  static const petOrangUtanDewasa = '$_base/pet/orang utan dewasa no bg.png';
+  static const petKucing          = '$_base/pet/kucing.png';
+
 
   // ===== FLAGS =====
   static const flagBrunei     = '$_base/flag/brunei.png';
