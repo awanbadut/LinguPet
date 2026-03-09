@@ -28,6 +28,9 @@ class AppAssets {
   static const petOrangUtanRemaja = '$_base/pet/orang utan remaja no bg.png';
   static const petOrangUtanDewasa = '$_base/pet/orang utan dewasa no bg.png';
   static const petKucing          = '$_base/pet/kucing.png';
+  static const String defaultAvatar = '$_base/avatar/avatar_default.png';
+
+
 
 
   // ===== FLAGS =====
