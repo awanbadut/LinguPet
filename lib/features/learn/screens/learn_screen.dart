@@ -28,7 +28,8 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
 
   static const List<_DiscoveryModule> _allModules = [
     _DiscoveryModule(
-      bold: 'Minang', flag: '🇮🇩',
+      bold: 'Minang',
+      flag: '🇮🇩',
       region: 'West Sumatra, Indonesia',
       percent: 0.70,
       progressLabel: 'Continue: Greeting Elders',
@@ -37,7 +38,8 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
       status: 'progress',
     ),
     _DiscoveryModule(
-      bold: 'Iban', flag: '🇲🇾',
+      bold: 'Iban',
+      flag: '🇲🇾',
       region: 'Sarawak, Malaysia',
       percent: 0.25,
       progressLabel: 'Continue: Greeting Elders',
@@ -46,7 +48,8 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
       status: 'progress',
     ),
     _DiscoveryModule(
-      bold: 'Melayu-Brunei', flag: '🇧🇳',
+      bold: 'Melayu-Brunei',
+      flag: '🇧🇳',
       region: 'Brunei-Muara, Brunei Darussalam',
       percent: 1.0,
       progressLabel: 'Yeay, You Already Master',
@@ -57,8 +60,12 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
   ];
 
   List<_DiscoveryModule> get _filtered {
-    if (_filterIndex == 1) return _allModules.where((m) => m.status == 'progress').toList();
-    if (_filterIndex == 2) return _allModules.where((m) => m.status == 'mastered').toList();
+    if (_filterIndex == 1) {
+      return _allModules.where((m) => m.status == 'progress').toList();
+    }
+    if (_filterIndex == 2) {
+      return _allModules.where((m) => m.status == 'mastered').toList();
+    }
     return _allModules;
   }
 
@@ -83,14 +90,18 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Ready to master a new Native Tongue, John?',
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF1A1A2E))),
+                Text(
+                  'Ready to master a new Native Tongue, John?',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1A1A2E)),
+                ),
                 SizedBox(height: 4),
-                Text('Keeping the vibes alive, one word at a time.',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF6B8499))),
+                Text(
+                  'Keeping the vibes alive, one word at a time.',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF6B8499)),
+                ),
               ],
             ),
           ),
@@ -100,14 +111,16 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Module Discovery',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFF1A1A2E))),
+                const Text(
+                  'Module Discovery',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF1A1A2E)),
+                ),
                 const SizedBox(height: 12),
 
-                // Filter chips
+                // ── FILTER CHIPS ──
                 Row(
                   children: [
                     _FilterChip(
@@ -151,6 +164,7 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
 class _PuzzleGrid extends StatelessWidget {
   final List<_DiscoveryModule> modules;
   final VoidCallback onAddNew;
+
   const _PuzzleGrid({required this.modules, required this.onAddNew});
 
   @override
@@ -203,6 +217,7 @@ class _PuzzleClipper extends CustomClipper<Path> {
     final p = Path();
 
     if (col == 0) {
+      // Kiri — benjolan keluar di kanan
       p.moveTo(r, 0);
       p.lineTo(s.width - r, 0);
       p.arcToPoint(Offset(s.width, r), radius: const Radius.circular(r));
@@ -222,6 +237,7 @@ class _PuzzleClipper extends CustomClipper<Path> {
       p.lineTo(0, r);
       p.arcToPoint(Offset(r, 0), radius: const Radius.circular(r));
     } else {
+      // Kanan — lubang masuk di kiri
       p.moveTo(r, 0);
       p.lineTo(s.width - r, 0);
       p.arcToPoint(Offset(s.width, r), radius: const Radius.circular(r));
@@ -256,6 +272,7 @@ class _PuzzleClipper extends CustomClipper<Path> {
 class _DiscoveryCard extends StatelessWidget {
   final _DiscoveryModule module;
   final int col;
+
   const _DiscoveryCard({required this.module, required this.col});
 
   @override
@@ -267,7 +284,6 @@ class _DiscoveryCard extends StatelessWidget {
             : const Color(0xFF4CAF50);
 
     return GestureDetector(
-      // ── Tap card body → Module Detail ──
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => ModuleDetailScreen(
@@ -295,23 +311,23 @@ class _DiscoveryCard extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              // ── TEXT ──
+              // ── TEKS ──
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Mastering',
-                        style: TextStyle(
-                            fontSize: 11, color: Colors.white70)),
+                        style:
+                            TextStyle(fontSize: 11, color: Colors.white70)),
                     Text(module.bold,
                         style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             color: Colors.white)),
                     const Text('Language',
-                        style:
-                            TextStyle(fontSize: 12, color: Colors.white)),
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.white)),
                     const SizedBox(height: 6),
                     Row(
                       children: [
@@ -333,7 +349,8 @@ class _DiscoveryCard extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: module.percent,
                         minHeight: 6,
-                        backgroundColor: Colors.white.withOpacity(0.3),
+                        backgroundColor:
+                            Colors.white.withOpacity(0.3),
                         valueColor: AlwaysStoppedAnimation(barColor),
                       ),
                     ),
@@ -363,7 +380,7 @@ class _DiscoveryCard extends StatelessWidget {
                 ),
               ),
 
-              // ── PLAY BUTTON → langsung ke ModuleStartScreen ──
+              // ── PLAY BUTTON → ModuleStartScreen ──
               Positioned(
                 bottom: 10,
                 right: 12,
@@ -407,6 +424,84 @@ class _DiscoveryCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
+// ADD NEW CARD
+// ═══════════════════════════════════════════
+class _AddNewCard extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddNewCard({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFD6EEF8),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+              color: const Color(0xFF38D1F5).withOpacity(0.3),
+              width: 1.5),
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_circle_outline_rounded,
+                size: 48, color: Color(0xFF38D1F5)),
+            SizedBox(height: 10),
+            Text('Add a New Language',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF2A5298))),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════
+// FILTER CHIP
+// ═══════════════════════════════════════════
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  const _FilterChip(
+      {required this.label,
+      required this.active,
+      required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: active ? const Color(0xFF38D1F5) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 1))
+          ],
+        ),
+        child: Text(label,
+            style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: active ? Colors.white : const Color(0xFF6B8499))),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════
 // MODULE LIBRARY SCREEN
 // ═══════════════════════════════════════════
 class ModuleLibraryScreen extends StatefulWidget {
@@ -422,7 +517,9 @@ class _ModuleLibraryScreenState extends State<ModuleLibraryScreen> {
 
   static const List<_CountryData> _countries = [
     _CountryData(
-      flag: '🇧🇳', name: 'Brunei Darussalam', count: 5,
+      flag: '🇧🇳',
+      name: 'Brunei Darussalam',
+      count: 5,
       modules: [
         _ModuleItem(bold: 'Melayu-Brunei', region: 'Brunei-Muara', color: Color(0xFFFFF3E0), petAsset: AppAssets.petTeen),
         _ModuleItem(bold: 'Tutong',        region: 'Tutong',        color: Color(0xFFE3F2FD), petAsset: AppAssets.petBaby),
@@ -433,7 +530,9 @@ class _ModuleLibraryScreenState extends State<ModuleLibraryScreen> {
     ),
     _CountryData(flag: '🇵🇭', name: 'Filipina', count: 180, modules: []),
     _CountryData(
-      flag: '🇮🇩', name: 'Indonesia', count: 450,
+      flag: '🇮🇩',
+      name: 'Indonesia',
+      count: 450,
       modules: [
         _ModuleItem(bold: 'Minang',   region: 'West Sumatra', color: Color(0xFFFFF3E0), petAsset: AppAssets.petAdult),
         _ModuleItem(bold: 'Javanese', region: 'East Jawa',    color: Color(0xFFE3F2FD), petAsset: AppAssets.petTeen),
@@ -461,6 +560,7 @@ class _ModuleLibraryScreenState extends State<ModuleLibraryScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // ── HEADER ──
             Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               decoration: const BoxDecoration(
@@ -477,7 +577,8 @@ class _ModuleLibraryScreenState extends State<ModuleLibraryScreen> {
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(
-                          width: 36, height: 36,
+                          width: 36,
+                          height: 36,
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.8),
                             borderRadius: BorderRadius.circular(10),
@@ -489,15 +590,17 @@ class _ModuleLibraryScreenState extends State<ModuleLibraryScreen> {
                       const SizedBox(width: 12),
                       const Expanded(
                         child: Text(
-                            'The Heritage Lab: Create Something New!',
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF1A1A2E))),
+                          'The Heritage Lab: Create Something New!',
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1A1A2E)),
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
+                  // Search bar
                   Container(
                     height: 44,
                     decoration: BoxDecoration(
@@ -514,7 +617,8 @@ class _ModuleLibraryScreenState extends State<ModuleLibraryScreen> {
                       controller: _searchCtrl,
                       style: const TextStyle(fontSize: 13),
                       decoration: const InputDecoration(
-                        hintText: 'Search for Country, Language or Region',
+                        hintText:
+                            'Search for Country, Language or Region',
                         hintStyle: TextStyle(
                             color: Color(0xFFB0BEC5), fontSize: 13),
                         prefixIcon: Icon(Icons.search_rounded,
@@ -528,6 +632,8 @@ class _ModuleLibraryScreenState extends State<ModuleLibraryScreen> {
                 ],
               ),
             ),
+
+            // ── BODY ──
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
@@ -579,8 +685,8 @@ class _CountryAccordion extends StatelessWidget {
         GestureDetector(
           onTap: onToggle,
           child: Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 12),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             margin: const EdgeInsets.only(bottom: 4),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -699,94 +805,13 @@ class _ModuleCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// FILTER CHIP
-// ═══════════════════════════════════════════
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool active;
-  final VoidCallback onTap;
-
-  const _FilterChip(
-      {required this.label,
-      required this.active,
-      required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: active
-              ? const Color(0xFF38D1F5)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 1))
-          ],
-        ),
-        child: Text(label,
-            style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: active
-                    ? Colors.white
-                    : const Color(0xFF6B8499))),
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════
-// ADD NEW CARD
-// ═══════════════════════════════════════════
-class _AddNewCard extends StatelessWidget {
-  final VoidCallback onTap;
-  const _AddNewCard({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFD6EEF8),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-              color: const Color(0xFF38D1F5).withOpacity(0.3),
-              width: 1.5),
-        ),
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add_circle_outline_rounded,
-                size: 48, color: Color(0xFF38D1F5)),
-            SizedBox(height: 10),
-            Text('Add a New Language',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF2A5298))),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════
 // DATA MODELS
 // ═══════════════════════════════════════════
 class _CountryData {
   final String flag, name;
   final int count;
   final List<_ModuleItem> modules;
+
   const _CountryData(
       {required this.flag,
       required this.name,
@@ -797,6 +822,7 @@ class _CountryData {
 class _ModuleItem {
   final String bold, region, petAsset;
   final Color color;
+
   const _ModuleItem(
       {required this.bold,
       required this.region,
@@ -808,6 +834,7 @@ class _DiscoveryModule {
   final String bold, flag, region, progressLabel, petAsset, status;
   final double percent;
   final Color bgColor;
+
   const _DiscoveryModule({
     required this.bold,
     required this.flag,
