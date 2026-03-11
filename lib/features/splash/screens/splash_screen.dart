@@ -13,51 +13,39 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-
-  // Circle ripple
-  late AnimationController _rippleController;
-  late Animation<double> _ripple1, _ripple2, _ripple3;
-  late Animation<double> _rippleOpacity1, _rippleOpacity2, _rippleOpacity3;
-
-  // Background circle fill
+  // ── Background circle fill ──
   late AnimationController _bgController;
   late Animation<double> _bgRadius;
-  late Animation<Color?> _bgColor;
 
-  // Mascot
+  // ── Mascot (Drop & Bounce) ──
   late AnimationController _mascotController;
   late Animation<double> _mascotY;
   late Animation<double> _mascotScale;
-  late Animation<double> _mascotOpacity;
-  late Animation<double> _mascotRotation;
 
-  // Shadow di bawah mascot
+  // ── Shadow ──
   late AnimationController _shadowController;
   late Animation<double> _shadowScale;
   late Animation<double> _shadowOpacity;
 
-  // Glow berdenyut
-  late AnimationController _glowController;
-  late Animation<double> _glowSize;
-  late Animation<double> _glowOpacity;
-
-  // Particles
+  // ── Particles ──
   late AnimationController _particleController;
   late Animation<double> _particleProgress;
 
-  // Text
+  // ── Text ──
   late AnimationController _textController;
   late Animation<double> _textOpacity;
   late Animation<double> _textSlideY;
-  late Animation<double> _textScale;
 
-  // Shimmer
+  // ── Shimmer ──
   late AnimationController _shimmerController;
   late Animation<double> _shimmerX;
 
-  bool _showParticles = false;
+  // ── Text squeeze saat GIF mendarat ──
+  late AnimationController _squeezeController;
+  late Animation<double> _squeezeScale;
 
-  final List<_Particle> _particles = List.generate(12, (i) => _Particle(i));
+  bool _showParticles = false;
+  final List<_Particle> _particles = List.generate(16, (i) => _Particle(i));
 
   @override
   void initState() {
@@ -68,119 +56,26 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _setupAnimations() {
-
-    // ── RIPPLE (3 lingkaran berurutan) ──
-    _rippleController = AnimationController(
+    // ── BACKGROUND WIPE ──
+    _bgController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 700),
+    );
+    _bgRadius = Tween<double>(begin: 0.0, end: 1200.0).animate(
+      CurvedAnimation(parent: _bgController, curve: Curves.easeInOutCubic),
     );
 
-    _ripple1 = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _rippleController,
-          curve: const Interval(0.0, 0.7, curve: Curves.easeOut)));
-    _ripple2 = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _rippleController,
-          curve: const Interval(0.15, 0.85, curve: Curves.easeOut)));
-    _ripple3 = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _rippleController,
-          curve: const Interval(0.3, 1.0, curve: Curves.easeOut)));
-
-    _rippleOpacity1 = Tween(begin: 0.6, end: 0.0).animate(
-      CurvedAnimation(parent: _rippleController,
-          curve: const Interval(0.0, 0.7, curve: Curves.easeIn)));
-    _rippleOpacity2 = Tween(begin: 0.4, end: 0.0).animate(
-      CurvedAnimation(parent: _rippleController,
-          curve: const Interval(0.15, 0.85, curve: Curves.easeIn)));
-    _rippleOpacity3 = Tween(begin: 0.25, end: 0.0).animate(
-      CurvedAnimation(parent: _rippleController,
-          curve: const Interval(0.3, 1.0, curve: Curves.easeIn)));
-
-    // ── BACKGROUND FILL ──
-    _bgController = AnimationController(
+    // ── MASCOT DROP & BOUNCE ──
+    _mascotController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     );
-
-    _bgRadius = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 0.0, end: 1000.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 50,
-      ),
-      TweenSequenceItem(tween: ConstantTween(1000.0), weight: 15),
-      TweenSequenceItem(
-        tween: Tween(begin: 1000.0, end: 0.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 35,
-      ),
-    ]).animate(_bgController);
-
-    _bgColor = ColorTween(
-      begin: const Color(0xFF38D1F5),
-      end: const Color(0xFF0BBCE0),
-    ).animate(CurvedAnimation(parent: _bgController, curve: Curves.easeInOut));
-
-    // ── MASCOT ──
-    _mascotController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
+    // Mulai dari sangat jauh di atas (-500) → turun ke posisi duduk di teks (0)
+    _mascotY = Tween<double>(begin: -500.0, end: 0.0).animate(
+      CurvedAnimation(parent: _mascotController, curve: Curves.elasticOut),
     );
-
-    _mascotY = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 350.0, end: -30.0)
-            .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 50,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: -30.0, end: 15.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
-        weight: 20,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 15.0, end: -8.0)
-            .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 15,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: -8.0, end: 0.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
-        weight: 15,
-      ),
-    ]).animate(_mascotController);
-
-    _mascotScale = TweenSequence<double>([
-      TweenSequenceItem(tween: ConstantTween(1.0), weight: 50),
-      TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.82)
-            .chain(CurveTween(curve: Curves.easeIn)),
-        weight: 20,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 0.82, end: 1.05)
-            .chain(CurveTween(curve: Curves.elasticOut)),
-        weight: 30,
-      ),
-    ]).animate(_mascotController);
-
-    _mascotRotation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: -0.05, end: 0.05)
-            .chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 50,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 0.05, end: 0.0)
-            .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 50,
-      ),
-    ]).animate(_mascotController);
-
-    _mascotOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _mascotController,
-        curve: const Interval(0.0, 0.2, curve: Curves.easeIn),
-      ),
+    _mascotScale = Tween<double>(begin: 0.1, end: 1.0).animate(
+      CurvedAnimation(parent: _mascotController, curve: Curves.elasticOut),
     );
 
     // ── SHADOW ──
@@ -188,71 +83,53 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
-
-    _shadowScale = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 0.1, end: 1.2)
-            .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 50,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 1.2, end: 0.8)
-            .chain(CurveTween(curve: Curves.easeIn)),
-        weight: 20,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 0.8, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 30,
-      ),
-    ]).animate(_shadowController);
-
-    _shadowOpacity = Tween<double>(begin: 0.0, end: 0.25).animate(
+    _shadowScale = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _shadowController, curve: Curves.elasticOut),
+    );
+    _shadowOpacity = Tween<double>(begin: 0.0, end: 0.3).animate(
       CurvedAnimation(
-        parent: _shadowController,
-        curve: const Interval(0.0, 0.3, curve: Curves.easeIn),
-      ),
+          parent: _shadowController, curve: const Interval(0.0, 0.5)),
     );
-
-    // ── GLOW berdenyut ──
-    _glowController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
-
-    _glowSize = Tween<double>(begin: 80.0, end: 130.0).animate(
-      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
-    );
-
-    _glowOpacity = Tween<double>(begin: 0.0, end: 0.0)
-        .animate(_glowController); // diaktifkan manual
 
     // ── PARTICLES ──
     _particleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
-
-    _particleProgress = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(
-            parent: _particleController, curve: Curves.easeOut));
+    _particleProgress = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+          parent: _particleController, curve: Curves.easeOutCubic),
+    );
 
     // ── TEXT ──
     _textController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 500),
     );
-
     _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _textController, curve: Curves.easeIn),
     );
-
     _textSlideY = Tween<double>(begin: 30.0, end: 0.0).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeOut),
+      CurvedAnimation(parent: _textController, curve: Curves.easeOutBack),
     );
 
-    _textScale = Tween<double>(begin: 0.7, end: 1.0).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.elasticOut),
+    // ── SQUEEZE (teks "ditekan" saat GIF mendarat) ──
+    _squeezeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    // Scale Y mengecil sedikit (efek tertekan) lalu balik normal
+    _squeezeScale = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 0.88),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.88, end: 1.0),
+        weight: 60,
+      ),
+    ]).animate(
+      CurvedAnimation(parent: _squeezeController, curve: Curves.easeInOut),
     );
 
     // ── SHIMMER ──
@@ -260,52 +137,43 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-
     _shimmerX = Tween<double>(begin: -200.0, end: 400.0).animate(
       CurvedAnimation(parent: _shimmerController, curve: Curves.easeInOut),
     );
   }
 
   void _startSequence() async {
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-    // 1. Ripple burst + background expand bersamaan
-    _rippleController.forward();
-    await _bgController.forward();
+    // 1. Background wipe
+    _bgController.forward();
 
-    // 2. Mascot + shadow muncul bersamaan
-    await Future.delayed(const Duration(milliseconds: 100));
-    _shadowController.forward();
-
-    // Aktifkan glow
-    _glowOpacity = Tween<double>(begin: 0.15, end: 0.35).animate(
-      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
-    );
-
-    await _mascotController.forward();
-
-    // 3. Particle burst saat mendarat
-    setState(() => _showParticles = true);
-    _particleController.forward();
-
-    // 4. Text muncul
-    await Future.delayed(const Duration(milliseconds: 200));
+    // 2. Text muncul duluan (target pijakan)
+    await Future.delayed(const Duration(milliseconds: 350));
     _textController.forward();
 
-    // 5. Shimmer sekali
-    await Future.delayed(const Duration(milliseconds: 300));
+    // 3. Mascot mulai jatuh setelah teks muncul
+    await Future.delayed(const Duration(milliseconds: 200));
+    _mascotController.forward();
+    _shadowController.forward();
+
+    // 4. Tepat saat GIF mendarat → squeeze teks + particles
+    Future.delayed(const Duration(milliseconds: 550), () {
+      if (mounted) {
+        _squeezeController.forward(); // Teks tertekan
+        setState(() => _showParticles = true);
+        _particleController.forward();
+      }
+    });
+
+    // 5. Shimmer
+    await Future.delayed(const Duration(milliseconds: 800));
     _shimmerController.forward();
 
-    // 6. ✨ IDLE — glow terus berdenyut, user menikmati splash
-    await Future.delayed(const Duration(milliseconds: 2800)); // ← TAMBAHAN
+    // 6. Idle hold
+    await Future.delayed(const Duration(milliseconds: 2500));
 
-    // 7. Shimmer kedua sebelum keluar (bonus!)
-    _shimmerController.reset();
-    await _shimmerController.forward();
-
-    // 8. Navigate (total ~5 detik)
-    await Future.delayed(const Duration(milliseconds: 400));
-
+    // 7. Navigate
     if (mounted) {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.manual,
@@ -315,16 +183,14 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-
   @override
   void dispose() {
-    _rippleController.dispose();
     _bgController.dispose();
     _mascotController.dispose();
     _shadowController.dispose();
-    _glowController.dispose();
     _particleController.dispose();
     _textController.dispose();
+    _squeezeController.dispose();
     _shimmerController.dispose();
     super.dispose();
   }
@@ -336,32 +202,10 @@ class _SplashScreenState extends State<SplashScreen>
     final cy = size.height / 2;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF38D1F5),
       body: Stack(
         children: [
-
-          // ── LAYER 1: Background ripple circles ──
-          AnimatedBuilder(
-            animation: _rippleController,
-            builder: (context, _) {
-              return CustomPaint(
-                size: size,
-                painter: _RipplePainter(
-                  center: Offset(cx, cy),
-                  maxRadius: 900,
-                  progresses: [_ripple1.value, _ripple2.value, _ripple3.value],
-                  opacities: [
-                    _rippleOpacity1.value,
-                    _rippleOpacity2.value,
-                    _rippleOpacity3.value,
-                  ],
-                  color: const Color(0xFF38D1F5),
-                ),
-              );
-            },
-          ),
-
-          // ── LAYER 2: Background fill circle ──
+          // ── LAYER 1: Background wipe ──
           AnimatedBuilder(
             animation: _bgController,
             builder: (context, _) {
@@ -370,78 +214,51 @@ class _SplashScreenState extends State<SplashScreen>
                 painter: _SolidCirclePainter(
                   center: Offset(cx, cy),
                   radius: _bgRadius.value,
-                  color: _bgColor.value ?? const Color(0xFF38D1F5),
+                  color: Colors.white,
                 ),
               );
             },
           ),
 
-          // ── LAYER 3: Mascot area ──
+          // ── LAYER 2: Komposisi utama (GIF di atas teks) ──
           Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-
-                // Glow + Mascot stack
-                SizedBox(
-                  width: 220,
-                  height: 220,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-
-                      // Glow berdenyut
-                      AnimatedBuilder(
-                        animation: _glowController,
-                        builder: (context, _) {
-                          return Container(
-                            width: _glowSize.value,
-                            height: _glowSize.value,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF38D1F5)
-                                      .withOpacity(_glowOpacity.value),
-                                  blurRadius: 40,
-                                  spreadRadius: 20,
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                // ── GIF Maskot (lebih besar, melompat dari atas) ──
+                AnimatedBuilder(
+                  animation: _mascotController,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, _mascotY.value),
+                      child: Transform.scale(
+                        scale: _mascotScale.value,
+                        child: child,
                       ),
-
-                      // Mascot
-                      AnimatedBuilder(
-                        animation: _mascotController,
-                        builder: (context, child) {
-                          return Opacity(
-                            opacity: _mascotOpacity.value,
-                            child: Transform.translate(
-                              offset: Offset(0, _mascotY.value),
-                              child: Transform.scale(
-                                scale: _mascotScale.value,
-                                child: Transform.rotate(
-                                  angle: _mascotRotation.value,
-                                  child: child,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        child: Image.asset(
-                          AppAssets.maskotWelcome,
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.contain,
-                        ),
+                    );
+                  },
+                  child: Image.asset(
+                    AppAssets.maskotLompat,
+                    width: 260,   // ✅ Lebih besar
+                    height: 260,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 260,
+                      height: 260,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE6F5FE),
+                        shape: BoxShape.circle,
                       ),
-                    ],
+                      child: const Icon(
+                        Icons.pets_rounded,
+                        size: 120,
+                        color: Color(0xFF38D1F5),
+                      ),
+                    ),
                   ),
                 ),
 
-                // Shadow di bawah mascot
+                // ── Shadow tepat di bawah GIF ──
                 AnimatedBuilder(
                   animation: _shadowController,
                   builder: (context, _) {
@@ -449,17 +266,18 @@ class _SplashScreenState extends State<SplashScreen>
                       opacity: _shadowOpacity.value,
                       child: Transform.scale(
                         scaleX: _shadowScale.value,
-                        scaleY: 0.3,
+                        scaleY: 0.25,
                         child: Container(
-                          width: 120,
+                          width: 140,
                           height: 20,
                           decoration: BoxDecoration(
+                            color: Colors.black,
                             borderRadius: BorderRadius.circular(50),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF38D1F5).withOpacity(0.8),
-                                blurRadius: 15,
-                                spreadRadius: 5,
+                                color: Colors.black.withOpacity(0.4),
+                                blurRadius: 12,
+                                spreadRadius: 4,
                               ),
                             ],
                           ),
@@ -469,19 +287,24 @@ class _SplashScreenState extends State<SplashScreen>
                   },
                 ),
 
-                const SizedBox(height: 24),
+                // ── Jarak negatif: teks "dinjak" GIF ──
+                const SizedBox(height: 1),
 
-                // TEXT dengan shimmer
+                // ── Teks LinguPet (muncul duluan, lalu "ditekan") ──
                 AnimatedBuilder(
-                  animation: Listenable.merge(
-                      [_textController, _shimmerController]),
+                  animation: Listenable.merge([
+                    _textController,
+                    _shimmerController,
+                    _squeezeController,
+                  ]),
                   builder: (context, child) {
                     return Opacity(
                       opacity: _textOpacity.value,
                       child: Transform.translate(
                         offset: Offset(0, _textSlideY.value),
+                        // ✅ Efek squeeze saat GIF mendarat
                         child: Transform.scale(
-                          scale: _textScale.value,
+                          scaleY: _squeezeScale.value,
                           child: ShaderMask(
                             blendMode: BlendMode.srcIn,
                             shaderCallback: (bounds) {
@@ -489,60 +312,57 @@ class _SplashScreenState extends State<SplashScreen>
                                 colors: const [
                                   Color(0xFF1A1A2E),
                                   Color(0xFF38D1F5),
-                                  Color(0xFFFFFFFF),
+                                  Colors.white,
                                   Color(0xFF38D1F5),
                                   Color(0xFF1A1A2E),
                                 ],
                                 stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
-                                transform: GradientRotation(0),
                                 begin: Alignment(
-                                    (_shimmerX.value / bounds.width) * 2 - 1,
-                                    0),
+                                  (_shimmerX.value / bounds.width) * 2 - 1,
+                                  0,
+                                ),
                                 end: Alignment(
-                                    (_shimmerX.value / bounds.width) * 2 + 1,
-                                    0),
+                                  (_shimmerX.value / bounds.width) * 2 + 1,
+                                  0,
+                                ),
                               ).createShader(bounds);
                             },
-                            child: child,
+                            child: RichText(
+                              text: const TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Lingu',
+                                    style: TextStyle(
+                                      fontSize: 46,
+                                      fontWeight: FontWeight.w900,
+                                      color: Color(0xFF1A1A2E),
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                  // ✅ 
+                                  TextSpan(
+                                    text: 'Pet',
+                                    style: TextStyle(
+                                      fontSize: 46,
+                                      fontWeight: FontWeight.w900,
+                                      color: Color(0xFF38D1F5),
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     );
                   },
-                  // Ganti ShaderMask dengan ini — hapus ShaderMask wrapper, langsung child:
-child: RichText(
-  text: TextSpan(
-    children: [
-      const TextSpan(
-        text: 'Lingu',
-        style: TextStyle(
-          fontSize: 38,
-          fontWeight: FontWeight.w800,
-          color: Color(0xFF1A1A2E),
-          letterSpacing: -0.5,
-        ),
-      ),
-      const TextSpan(
-        text: 'Pet',
-        style: TextStyle(
-          fontSize: 38,
-          fontWeight: FontWeight.w800,
-          color: Color(0xFF38D1F5), // cyan tetap
-          letterSpacing: -0.5,
-        ),
-      ),
-    ],
-  ),
-),
-
-
                 ),
-
               ],
             ),
           ),
 
-          // ── LAYER 4: Particle burst ──
+          // ── LAYER 3: Particles (meledak dari titik pendaratan) ──
           if (_showParticles)
             AnimatedBuilder(
               animation: _particleController,
@@ -552,59 +372,30 @@ child: RichText(
                   painter: _ParticlePainter(
                     particles: _particles,
                     progress: _particleProgress.value,
-                    center: Offset(cx, cy - 10),
+                    center: Offset(cx, cy + 10),
                   ),
                 );
               },
             ),
-
         ],
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════
 // PAINTERS & HELPERS
-// ─────────────────────────────────────────
-
-class _RipplePainter extends CustomPainter {
-  final Offset center;
-  final double maxRadius;
-  final List<double> progresses;
-  final List<double> opacities;
-  final Color color;
-
-  _RipplePainter({
-    required this.center,
-    required this.maxRadius,
-    required this.progresses,
-    required this.opacities,
-    required this.color,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    for (int i = 0; i < progresses.length; i++) {
-      final paint = Paint()
-        ..color = color.withOpacity(opacities[i])
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.0;
-      canvas.drawCircle(center, maxRadius * progresses[i], paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_RipplePainter old) => true;
-}
-
+// ═══════════════════════════════════════════
 class _SolidCirclePainter extends CustomPainter {
   final Offset center;
   final double radius;
   final Color color;
 
-  _SolidCirclePainter(
-      {required this.center, required this.radius, required this.color});
+  _SolidCirclePainter({
+    required this.center,
+    required this.radius,
+    required this.color,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -624,16 +415,16 @@ class _Particle {
   final Color color;
 
   _Particle(int index)
-      : angle = (index / 12) * 2 * pi + Random().nextDouble() * 0.5,
-        speed = 60 + Random().nextDouble() * 80,
-        size = 4 + Random().nextDouble() * 6,
+      : angle = (index / 16) * 2 * pi + Random().nextDouble() * 0.4,
+        speed = 60 + Random().nextDouble() * 120,
+        size = 4 + Random().nextDouble() * 8,
         color = [
           const Color(0xFF38D1F5),
           const Color(0xFF0BBCE0),
           const Color(0xFFFFD700),
           const Color(0xFFFF6B6B),
-          const Color(0xFF38D1F5),
-          const Color(0xFFFFFFFF),
+          const Color(0xFF7C4DFF),
+          const Color(0xFF00E676),
         ][index % 6];
 }
 
@@ -642,10 +433,11 @@ class _ParticlePainter extends CustomPainter {
   final double progress;
   final Offset center;
 
-  _ParticlePainter(
-      {required this.particles,
-      required this.progress,
-      required this.center});
+  _ParticlePainter({
+    required this.particles,
+    required this.progress,
+    required this.center,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -654,10 +446,14 @@ class _ParticlePainter extends CustomPainter {
       final x = center.dx + cos(p.angle) * dist;
       final y = center.dy + sin(p.angle) * dist;
       final opacity = (1.0 - progress).clamp(0.0, 1.0);
-      final paint = Paint()
-        ..color = p.color.withOpacity(opacity)
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(Offset(x, y), p.size * (1 - progress * 0.5), paint);
+
+      canvas.drawCircle(
+        Offset(x, y),
+        p.size * (1 - progress * 0.5),
+        Paint()
+          ..color = p.color.withOpacity(opacity)
+          ..style = PaintingStyle.fill,
+      );
     }
   }
 

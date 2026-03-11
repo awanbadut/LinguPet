@@ -7,11 +7,12 @@ class AppAssets {
   // ===== MASKOT =====
   static const String welcome = '$_base/maskot/welcome.png';
   static const maskotWelcome = '$_base/maskot/welcome.png';
-  static const maskotLompat = '$_base/maskot/lompat.mp4';
+  static const maskotLompat = '$_base/maskot/lompat.gif';
   static const onboard1 = '$_base/maskot/onboard 1.png';
   static const onboard2 = '$_base/maskot/onboard 2.png';
   static const onboard3 = '$_base/maskot/onoard 3.png';
   static const binggung = '$_base/maskot/binggung.png';
+  static const tunjuk = '$_base/maskot/tunjuk.png';
 
   // ===== PET KABAU STAGES =====
   static const petEgg = '$_base/pet/kabau telur no bg.png';
@@ -26,6 +27,7 @@ class AppAssets {
   static const petDefault = '$_base/pet/default.png';
   static const petBurung = '$_base/pet/burung.png';
   static const petOrangUtanAnak = '$_base/pet/orang utan anak.png';
+  static const petOrangUtanAnaknobg = '$_base/pet/orang utan anak no bg.png';
   static const petOrangUtanRemaja = '$_base/pet/orang utan remaja no bg.png';
   static const petOrangUtanDewasa = '$_base/pet/orang utan dewasa no bg.png';
   static const petKucing = '$_base/pet/kucing.png';

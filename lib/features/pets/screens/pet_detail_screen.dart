@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lingupet/core/constants/app_assets.dart';
 import 'package:lingupet/features/pets/screens/build_vocabulary_page.dart';
+import 'package:lingupet/features/pets/screens/language_dictionary_page.dart';
+import 'package:lingupet/features/pets/screens/pet_detail_page.dart';
+import 'package:lingupet/features/pets/screens/pet_list_page.dart';
 
 // ═══════════════════════════════════════════
 // DATA MODEL
@@ -16,6 +19,16 @@ class _Pet {
   final double happiness;
   final double energy;
   final Color nameColor;
+  final String language;
+  final int vocabularyCount;
+  final int audioCount;
+  final int contributorCount;
+  final String stageName;
+  final String stageDescription;
+  final int nextLevelRequired;
+  final int nextVocabRequired;
+  final int nextAudioRequired;
+  final String accent;
 
   const _Pet({
     required this.name,
@@ -27,7 +40,17 @@ class _Pet {
     required this.hunger,
     required this.happiness,
     required this.energy,
+    required this.language,
     this.nameColor = const Color(0xFF1A1A1A),
+    this.vocabularyCount = 0,
+    this.audioCount = 0,
+    this.contributorCount = 0,
+    this.stageName = 'Baby',
+    this.stageDescription = '',
+    this.nextLevelRequired = 10,
+    this.nextVocabRequired = 100,
+    this.nextAudioRequired = 50,
+    this.accent = '',
   });
 }
 
@@ -42,7 +65,17 @@ const _petList = [
     hunger: 0.85,
     happiness: 0.90,
     energy: 0.75,
+    language: 'Minang Language',
     nameColor: Color(0xFF1A1A1A),
+    vocabularyCount: 1574,
+    audioCount: 890,
+    contributorCount: 156,
+    stageName: 'Baby',
+    stageDescription: 'A well-established dialect with many speakers and a rich vocabulary.',
+    nextLevelRequired: 65,
+    nextVocabRequired: 1300,
+    nextAudioRequired: 975,
+    accent: 'Minang with an authentic Minang accent',
   ),
   _Pet(
     name: 'Oru the Borneo',
@@ -54,11 +87,20 @@ const _petList = [
     hunger: 0.85,
     happiness: 0.90,
     energy: 0.75,
+    language: 'Borneo Language',
     nameColor: Colors.white,
+    vocabularyCount: 843,
+    audioCount: 412,
+    contributorCount: 78,
+    stageName: 'Baby',
+    stageDescription: 'A developing dialect with growing community contributions.',
+    nextLevelRequired: 65,
+    nextVocabRequired: 1300,
+    nextAudioRequired: 975,
+    accent: 'Borneo with an authentic Dayak accent',
   ),
 ];
 
-// total halaman = pet + 1 halaman "Raise Another Pet"
 final _totalPages = _petList.length + 1;
 
 // ═══════════════════════════════════════════
@@ -95,75 +137,77 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // ── Swipeable pages ──
-        PageView.builder(
-          controller: _ctrl,
-          itemCount: _totalPages,
-          onPageChanged: (i) => setState(() => _current = i),
-          itemBuilder: (_, i) {
-            // Halaman terakhir = Raise Another Pet
-            if (i == _petList.length) {
-              return _RaiseAnotherPetPage(
-                onTap: () {
-                  // TODO: navigasi ke halaman pilih pet baru
-                },
-              );
-            }
-            // Halaman pet normal
-            return _PetPage(
-              pet: _petList[i],
-              hunger: _hunger[i],
-              happiness: _happiness[i],
-              energy: _energy[i],
-              onFeed: (dH, dHa, dE) => setState(() {
-                _hunger[i] = (_hunger[i] + dH).clamp(0.0, 1.0);
-                _happiness[i] = (_happiness[i] + dHa).clamp(0.0, 1.0);
-                _energy[i] = (_energy[i] + dE).clamp(0.0, 1.0);
-              }),
-            );
-          },
-        ),
-
-        // ── Dot indicators ──
-        Positioned(
-          bottom: 16,
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_totalPages, (i) {
-              final active = i == _current;
-              final isLast = i == _petList.length;
-              return GestureDetector(
-                onTap: () => _ctrl.animateToPage(
-                  i,
-                  duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeInOut,
-                ),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: active ? 22 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: active
-                        ? (isLast
-                            ? const Color(
-                                0xFFFDB913) // dot aktif kuning di halaman raise
-                            : Colors.white)
-                        : (isLast
-                            ? const Color(0xFFFDB913).withOpacity(0.4)
-                            : Colors.white.withOpacity(0.45)),
-                    borderRadius: BorderRadius.circular(4),
+    // ✅ FIX 1: Wrap dengan Material(color: transparent)
+    // Ini menghilangkan garis kuning pada semua Text di dalamnya
+    return Material(
+      color: Colors.transparent,
+      child: Stack(
+        children: [
+          // ── Swipeable pages ──
+          PageView.builder(
+            controller: _ctrl,
+            itemCount: _totalPages,
+            onPageChanged: (i) => setState(() => _current = i),
+            itemBuilder: (_, i) {
+              if (i == _petList.length) {
+                return _RaiseAnotherPetPage(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PetListPage()),
                   ),
-                ),
+                );
+              }
+              return _PetPage(
+                pet: _petList[i],
+                hunger: _hunger[i],
+                happiness: _happiness[i],
+                energy: _energy[i],
+                onFeed: (dH, dHa, dE) => setState(() {
+                  _hunger[i] = (_hunger[i] + dH).clamp(0.0, 1.0);
+                  _happiness[i] = (_happiness[i] + dHa).clamp(0.0, 1.0);
+                  _energy[i] = (_energy[i] + dE).clamp(0.0, 1.0);
+                }),
               );
-            }),
+            },
           ),
-        ),
-      ],
+
+          // ── Dot indicators ──
+          // ✅ FIX 2: bottom: 96 agar tidak tertutup bottom nav (85px)
+          Positioned(
+            bottom: 96,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(_totalPages, (i) {
+                final active = i == _current;
+                final isLast = i == _petList.length;
+                return GestureDetector(
+                  onTap: () => _ctrl.animateToPage(
+                    i,
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeInOut,
+                  ),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: active ? 22 : 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: active
+                          ? (isLast ? const Color(0xFFFDB913) : Colors.white)
+                          : (isLast
+                              ? const Color(0xFFFDB913).withOpacity(0.4)
+                              : Colors.white.withOpacity(0.45)),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -193,7 +237,6 @@ class _RaiseAnotherPetPage extends StatelessWidget {
       child: SafeArea(
         child: Column(
           children: [
-            // ── Wave top ──
             ClipPath(
               clipper: _WaveClipper(),
               child: Container(
@@ -201,29 +244,21 @@ class _RaiseAnotherPetPage extends StatelessWidget {
                 color: const Color(0xFF9AD8F0).withOpacity(0.5),
               ),
             ),
-
             const Spacer(flex: 1),
-
-            // ── Maskot binggung ──
             Image.asset(
               AppAssets.binggung,
               width: 260,
               height: 280,
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const Text(
-                '🐻',
-                style: TextStyle(fontSize: 120),
-              ),
+              errorBuilder: (_, __, ___) =>
+                  const Text('🐻', style: TextStyle(fontSize: 120)),
             ),
-
             const Spacer(flex: 1),
-
-            // ── Teks ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Column(
-                children: [
-                  const Text(
+                children: const [
+                  Text(
                     'Raise Another Pet',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -233,8 +268,8 @@ class _RaiseAnotherPetPage extends StatelessWidget {
                       letterSpacing: 0.3,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: 16),
+                  Text(
                     'Grow another pet and help introduce and develop local languages together. Each pet represents a regional language you can learn, practice, and share with others. By raising more pets, you help keep these languages alive and connect with different cultures.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -246,10 +281,7 @@ class _RaiseAnotherPetPage extends StatelessWidget {
                 ],
               ),
             ),
-
             const Spacer(flex: 2),
-
-            // ── CTA Button ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: SizedBox(
@@ -277,8 +309,8 @@ class _RaiseAnotherPetPage extends StatelessWidget {
                 ),
               ),
             ),
-
-            const SizedBox(height: 48), // ruang untuk dot indicator
+            // ✅ FIX 3: SizedBox tinggi 100 agar button tidak tertutup nav bar
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -304,6 +336,25 @@ class _PetPage extends StatelessWidget {
     required this.onFeed,
   });
 
+  PetDetailData _toDetailData() => PetDetailData(
+        name: pet.name,
+        region: pet.region,
+        flag: pet.flag,
+        bgAsset: pet.bgAsset,
+        language: pet.language,
+        level: pet.level,
+        progress: pet.progress,
+        vocabularyCount: pet.vocabularyCount,
+        audioCount: pet.audioCount,
+        contributorCount: pet.contributorCount,
+        stageName: pet.stageName,
+        stageDescription: pet.stageDescription,
+        nextLevelRequired: pet.nextLevelRequired,
+        nextVocabRequired: pet.nextVocabRequired,
+        nextAudioRequired: pet.nextAudioRequired,
+        accent: pet.accent,
+      );
+
   @override
   Widget build(BuildContext context) {
     final isDark = pet.nameColor == Colors.white;
@@ -311,6 +362,7 @@ class _PetPage extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
+        // Background
         Image.asset(
           pet.bgAsset,
           fit: BoxFit.cover,
@@ -326,11 +378,14 @@ class _PetPage extends StatelessWidget {
             ),
           ),
         ),
+
         SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 12),
+
+              // Top Pills
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -341,17 +396,27 @@ class _PetPage extends StatelessWidget {
                       label: 'Detail',
                       iconColor: const Color(0xFF0066CC),
                       textColor: const Color(0xFF0066CC),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PetDetailPage(data: _toDetailData()),
+                        ),
+                      ),
                     ),
                     _TopPill(
                       icon: Icons.emoji_events_outlined,
                       label: 'Level ${pet.level}',
                       iconColor: const Color(0xFF333333),
                       textColor: const Color(0xFF333333),
+                      onTap: null,
                     ),
                   ],
                 ),
               ),
+
               const SizedBox(height: 20),
+
+              // Pet Name
               Text(
                 pet.name,
                 textAlign: TextAlign.center,
@@ -360,14 +425,14 @@ class _PetPage extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: pet.nameColor,
                   shadows: const [
-                    Shadow(
-                        color: Colors.black26,
-                        blurRadius: 8,
-                        offset: Offset(0, 2)),
+                    Shadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2)),
                   ],
                 ),
               ),
+
               const SizedBox(height: 6),
+
+              // Region
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -378,89 +443,113 @@ class _PetPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       color: pet.nameColor.withOpacity(0.9),
-                      shadows: const [
-                        Shadow(color: Colors.black26, blurRadius: 6)
-                      ],
+                      shadows: const [Shadow(color: Colors.black26, blurRadius: 6)],
                     ),
                   ),
                 ],
               ),
+
               const SizedBox(height: 18),
+
+              // Stat Cards
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
                     Expanded(
-                        child: _StatCard(
-                            icon: Icons.local_fire_department_rounded,
-                            iconColor: const Color(0xFFFF9800),
-                            label: 'Hunger',
-                            value: hunger,
-                            barColor: const Color(0xFFFF9800))),
+                      child: _StatCard(
+                        icon: Icons.local_fire_department_rounded,
+                        iconColor: const Color(0xFFFF9800),
+                        label: 'Hunger',
+                        value: hunger,
+                        barColor: const Color(0xFFFF9800),
+                      ),
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
-                        child: _StatCard(
-                            icon: Icons.favorite_rounded,
-                            iconColor: const Color(0xFFE91E63),
-                            label: 'Hapinnes',
-                            value: happiness,
-                            barColor: const Color(0xFFE91E63))),
+                      child: _StatCard(
+                        icon: Icons.favorite_rounded,
+                        iconColor: const Color(0xFFE91E63),
+                        label: 'Happiness',
+                        value: happiness,
+                        barColor: const Color(0xFFE91E63),
+                      ),
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
-                        child: _StatCard(
-                            icon: Icons.bolt_rounded,
-                            iconColor: const Color(0xFF00A8CC),
-                            label: 'Energy',
-                            value: energy,
-                            barColor: const Color(0xFF00A8CC))),
+                      child: _StatCard(
+                        icon: Icons.bolt_rounded,
+                        iconColor: const Color(0xFF00A8CC),
+                        label: 'Energy',
+                        value: energy,
+                        barColor: const Color(0xFF00A8CC),
+                      ),
+                    ),
                   ],
                 ),
               ),
+
               const Spacer(),
+
+              // Bottom Actions
+              // ✅ FIX 4: bottom: 100 agar tidak tertutup bottom nav (85px)
               Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 48),
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 100),
                 child: Column(
                   children: [
                     Row(
                       children: [
-                        // SESUDAH
-Expanded(child: _ActionButton(
-  icon: Icons.apple_rounded,
-  emoji: '🍎',
-  label: 'Feed',
-  bgColor: const Color(0xFFFDB913),
-  textColor: Colors.white,
-  onTap: () => Navigator.push(           // ← jadi ini
-    context,
-    MaterialPageRoute(
-      builder: (_) => const BuildVocabularyPage(),
-    ),
-  ),
-)),
-
+                        Expanded(
+                          child: _ActionButton(
+                            icon: Icons.apple_rounded,
+                            emoji: '🍎',
+                            label: 'Feed',
+                            bgColor: const Color(0xFFFDB913),
+                            textColor: Colors.white,
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const BuildVocabularyPage(),
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
-                            child: _ActionButton(
-                                icon: Icons.menu_book_rounded,
-                                emoji: '📖',
-                                label: 'Vocabulary',
-                                bgColor: const Color(0xFF1A3A5C),
-                                textColor: Colors.white,
-                                onTap: () {})),
+                          child: _ActionButton(
+                            icon: Icons.menu_book_rounded,
+                            emoji: '📖',
+                            label: 'Vocabulary',
+                            bgColor: const Color(0xFF1A3A5C),
+                            textColor: Colors.white,
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => LanguageDictionaryPage(
+                                  petName: pet.name,
+                                  languageName: pet.language,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
+
                     const SizedBox(height: 12),
+
+                    // Level Progress Card
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3))
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
                         ],
                       ),
                       child: Column(
@@ -468,16 +557,22 @@ Expanded(child: _ActionButton(
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Level Progress',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF1A1A1A))),
-                              Text('${(pet.progress * 100).toInt()}%',
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFFFF6B6B))),
+                              const Text(
+                                'Level Progress',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF1A1A1A),
+                                ),
+                              ),
+                              Text(
+                                '${(pet.progress * 100).toInt()}%',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFFFF6B6B),
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 10),
@@ -487,8 +582,7 @@ Expanded(child: _ActionButton(
                               value: pet.progress,
                               minHeight: 10,
                               backgroundColor: const Color(0xFFE5E5E5),
-                              valueColor: const AlwaysStoppedAnimation(
-                                  Color(0xFFFDB913)),
+                              valueColor: const AlwaysStoppedAnimation(Color(0xFFFDB913)),
                             ),
                           ),
                         ],
@@ -518,62 +612,37 @@ Expanded(child: _ActionButton(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                    color: const Color(0xFFE2E8F0),
-                    borderRadius: BorderRadius.circular(2))),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE2E8F0),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 18),
-            Text('Feed ${pet.name.split(' ').first}',
-                style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF011E2F))),
+            Text(
+              'Feed ${pet.name.split(' ').first}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF011E2F),
+              ),
+            ),
             const SizedBox(height: 4),
-            const Text('Choose a food item to feed your pet',
-                style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+            const Text(
+              'Choose a food item to feed your pet',
+              style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+            ),
             const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(
-                    child: _FoodItem(
-                        emoji: '🍖',
-                        name: 'Meat',
-                        xp: '+15 XP',
-                        onTap: () {
-                          onFeed(0.30, 0.10, 0.00);
-                          Navigator.pop(context);
-                        })),
+                Expanded(child: _FoodItem(emoji: '🍖', name: 'Meat', xp: '+15 XP', onTap: () { onFeed(0.30, 0.10, 0.00); Navigator.pop(context); })),
                 const SizedBox(width: 8),
-                Expanded(
-                    child: _FoodItem(
-                        emoji: '🌾',
-                        name: 'Grain',
-                        xp: '+8 XP',
-                        onTap: () {
-                          onFeed(0.15, 0.00, 0.00);
-                          Navigator.pop(context);
-                        })),
+                Expanded(child: _FoodItem(emoji: '🌾', name: 'Grain', xp: '+8 XP', onTap: () { onFeed(0.15, 0.00, 0.00); Navigator.pop(context); })),
                 const SizedBox(width: 8),
-                Expanded(
-                    child: _FoodItem(
-                        emoji: '🍎',
-                        name: 'Fruit',
-                        xp: '+10 XP',
-                        onTap: () {
-                          onFeed(0.20, 0.05, 0.10);
-                          Navigator.pop(context);
-                        })),
+                Expanded(child: _FoodItem(emoji: '🍎', name: 'Fruit', xp: '+10 XP', onTap: () { onFeed(0.20, 0.05, 0.10); Navigator.pop(context); })),
                 const SizedBox(width: 8),
-                Expanded(
-                    child: _FoodItem(
-                        emoji: '🫙',
-                        name: 'Premium',
-                        xp: '+30 XP',
-                        onTap: () {
-                          onFeed(0.50, 0.30, 0.20);
-                          Navigator.pop(context);
-                        })),
+                Expanded(child: _FoodItem(emoji: '🫙', name: 'Premium', xp: '+30 XP', onTap: () { onFeed(0.50, 0.30, 0.20); Navigator.pop(context); })),
               ],
             ),
           ],
@@ -591,8 +660,7 @@ class _WaveClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(0, 0);
-    path.quadraticBezierTo(
-        size.width * 0.25, size.height, size.width * 0.5, size.height * 0.5);
+    path.quadraticBezierTo(size.width * 0.25, size.height, size.width * 0.5, size.height * 0.5);
     path.quadraticBezierTo(size.width * 0.75, 0, size.width, size.height * 0.6);
     path.lineTo(size.width, 0);
     path.close();
@@ -611,36 +679,44 @@ class _TopPill extends StatelessWidget {
   final String label;
   final Color iconColor;
   final Color textColor;
+  final VoidCallback? onTap;
 
-  const _TopPill(
-      {required this.icon,
-      required this.label,
-      required this.iconColor,
-      required this.textColor});
+  const _TopPill({
+    required this.icon,
+    required this.label,
+    required this.iconColor,
+    required this.textColor,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(999),
-        boxShadow: [
-          BoxShadow(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(999),
+          boxShadow: [
+            BoxShadow(
               color: Colors.black.withOpacity(0.12),
               blurRadius: 8,
-              offset: const Offset(0, 2))
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: iconColor),
-          const SizedBox(width: 6),
-          Text(label,
-              style: TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
-        ],
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: iconColor),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -653,12 +729,13 @@ class _StatCard extends StatelessWidget {
   final double value;
   final Color barColor;
 
-  const _StatCard(
-      {required this.icon,
-      required this.iconColor,
-      required this.label,
-      required this.value,
-      required this.barColor});
+  const _StatCard({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.value,
+    required this.barColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -668,10 +745,7 @@ class _StatCard extends StatelessWidget {
         color: Colors.white.withOpacity(0.92),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 6,
-              offset: const Offset(0, 2))
+          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 6, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -680,26 +754,23 @@ class _StatCard extends StatelessWidget {
           Row(children: [
             Icon(icon, size: 16, color: iconColor),
             const SizedBox(width: 4),
-            Text(label,
-                style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF555555)))
+            Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF555555))),
           ]),
           const SizedBox(height: 8),
           ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                  value: value,
-                  minHeight: 7,
-                  backgroundColor: const Color(0xFFE5E5E5),
-                  valueColor: AlwaysStoppedAnimation(barColor))),
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: value,
+              minHeight: 7,
+              backgroundColor: const Color(0xFFE5E5E5),
+              valueColor: AlwaysStoppedAnimation(barColor),
+            ),
+          ),
           const SizedBox(height: 5),
-          Text('${(value * 100).toInt()}%',
-              style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A1A))),
+          Text(
+            '${(value * 100).toInt()}%',
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)),
+          ),
         ],
       ),
     );
@@ -714,13 +785,14 @@ class _ActionButton extends StatelessWidget {
   final Color textColor;
   final VoidCallback onTap;
 
-  const _ActionButton(
-      {required this.icon,
-      required this.emoji,
-      required this.label,
-      required this.bgColor,
-      required this.textColor,
-      required this.onTap});
+  const _ActionButton({
+    required this.icon,
+    required this.emoji,
+    required this.label,
+    required this.bgColor,
+    required this.textColor,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -732,21 +804,14 @@ class _ActionButton extends StatelessWidget {
           color: bgColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(
-                color: bgColor.withOpacity(0.4),
-                blurRadius: 10,
-                offset: const Offset(0, 4))
+            BoxShadow(color: bgColor.withOpacity(0.4), blurRadius: 10, offset: const Offset(0, 4)),
           ],
         ),
         child: Column(
           children: [
             Text(emoji, style: const TextStyle(fontSize: 30)),
             const SizedBox(height: 6),
-            Text(label,
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: textColor)),
+            Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: textColor)),
           ],
         ),
       ),
@@ -760,11 +825,12 @@ class _FoodItem extends StatelessWidget {
   final String xp;
   final VoidCallback onTap;
 
-  const _FoodItem(
-      {required this.emoji,
-      required this.name,
-      required this.xp,
-      required this.onTap});
+  const _FoodItem({
+    required this.emoji,
+    required this.name,
+    required this.xp,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -781,17 +847,9 @@ class _FoodItem extends StatelessWidget {
           children: [
             Text(emoji, style: const TextStyle(fontSize: 26)),
             const SizedBox(height: 4),
-            Text(name,
-                style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF334155))),
+            Text(name, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
             const SizedBox(height: 2),
-            Text(xp,
-                style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF10B981))),
+            Text(xp, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF10B981))),
           ],
         ),
       ),

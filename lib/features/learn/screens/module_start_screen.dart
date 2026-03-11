@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:lingupet/features/learn/screens/lesson_screen.dart';
 
 // ═══════════════════════════════════════════
 // MODULE START SCREEN
 // ═══════════════════════════════════════════
-class ModuleStartScreen extends StatelessWidget {
+class ModuleStartScreen extends StatefulWidget {
   final String moduleName;
   final String flag;
   final String region;
@@ -24,106 +25,166 @@ class ModuleStartScreen extends StatelessWidget {
   });
 
   @override
+  State<ModuleStartScreen> createState() => _ModuleStartScreenState();
+}
+
+class _ModuleStartScreenState extends State<ModuleStartScreen> {
+  // Melacak status expand/collapse tiap topik (Index 0 adalah Topic 1)
+  final List<bool> _expandedTopics = [true, false, false, false];
+
+  void _toggleTopic(int index) {
+    setState(() {
+      _expandedTopics[index] = !_expandedTopics[index];
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F8FF),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _CourseProgressCard(
-                        petAsset: petAsset, percent: percent),
-                    const SizedBox(height: 16),
-                    _Topic1Card(
-                      petAsset: petAsset,
-                      onStartLesson: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              LessonScreen(petAsset: petAsset),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const _LockedTopicCard(
-                        title: 'Topic 2 : Sollicitudin pellentesque',
-                        stepCount: 5),
-                    const SizedBox(height: 10),
-                    const _LockedTopicCard(
-                        title: 'Topic 3 : Vulputate ultrices quisque',
-                        stepCount: 5),
-                    const SizedBox(height: 10),
-                    const _LockedTopicCard(
-                        title: 'Topic 4: ut maecenas accumsan.',
-                        stepCount: 5),
-                    const SizedBox(height: 24),
-                  ],
+      backgroundColor: const Color(0xFFFAFAFA),
+      body: Stack(
+        children: [
+          // ── BACKGROUND WAVE HEADER ──
+          ClipPath(
+            clipper: _HeaderWaveClipper(),
+            child: Container(
+              height: 220,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF42E0FF), Color(0xFFE8F6FB), Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  stops: [0.0, 0.4, 1.0],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+
+          // ── MAIN SCROLLABLE CONTENT ──
+          SafeArea(
+            bottom: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildTopBar(context),
+                  const SizedBox(height: 16),
+                  
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        // COURSE PROGRESS
+                        _CourseProgressCard(
+                          petAsset: widget.petAsset,
+                          percent: widget.percent,
+                        ),
+                        const SizedBox(height: 24),
+
+                        // TOPIC 1 (Active)
+                        _TopicAccordion(
+                          title: 'Topic 1: facilisi tellus at blandit. Ac',
+                          stepCount: 5,
+                          isLocked: false,
+                          isExpanded: _expandedTopics[0],
+                          onToggle: () => _toggleTopic(0),
+                          onStartLesson: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => LessonScreen(petAsset: widget.petAsset),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // TOPIC 2 (Locked)
+                        _TopicAccordion(
+                          title: 'Topic 2 : Sollicitudin pellentesque',
+                          stepCount: 5,
+                          isLocked: true,
+                          isExpanded: _expandedTopics[1],
+                          onToggle: () => _toggleTopic(1),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // TOPIC 3 (Locked)
+                        _TopicAccordion(
+                          title: 'Topic 3 : Vulputate ultrices quisque',
+                          stepCount: 5,
+                          isLocked: true,
+                          isExpanded: _expandedTopics[2],
+                          onToggle: () => _toggleTopic(2),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // TOPIC 4 (Locked)
+                        _TopicAccordion(
+                          title: 'Topic 4: ut maecenas accumsan.',
+                          stepCount: 5,
+                          isLocked: true,
+                          isExpanded: _expandedTopics[3],
+                          onToggle: () => _toggleTopic(3),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF9FD8F0), Color(0xFFD6EEF8)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Column(
+  Widget _buildTopBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Row(
-            children: [
-              // ── CLOSE → pop() ──
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  width: 36, height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.85),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.close_rounded,
-                      size: 18, color: Color(0xFF1A1A2E)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
                 ),
+                child: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF05354C)),
               ),
-              Expanded(
-                child: Text(
-                  moduleName,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1A1A2E)),
-                ),
-              ),
-              const SizedBox(width: 36),
-            ],
+            ),
           ),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Column(
             children: [
-              Text(flag, style: const TextStyle(fontSize: 14)),
-              const SizedBox(width: 6),
-              Text(region,
-                  style: const TextStyle(
-                      fontSize: 13, color: Color(0xFF4A5568))),
+              Text(
+                widget.moduleName,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF05354C),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(widget.flag, style: const TextStyle(fontSize: 14)),
+                  const SizedBox(width: 6),
+                  Text(
+                    widget.region,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF05354C),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -138,41 +199,47 @@ class ModuleStartScreen extends StatelessWidget {
 class _CourseProgressCard extends StatelessWidget {
   final String petAsset;
   final double percent;
-  const _CourseProgressCard(
-      {required this.petAsset, required this.percent});
+
+  const _CourseProgressCard({required this.petAsset, required this.percent});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2)),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Row(
         children: [
+          // Pet Image with Glow Background
           Container(
-            width: 60, height: 60,
-            decoration: const BoxDecoration(
-              color: Color(0xFFEAF4F8),
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
+              color: const Color(0xFFFFF6ED),
+              border: Border.all(color: const Color(0xFFF1F5F9), width: 1),
             ),
             child: ClipOval(
-              child: Image.asset(petAsset,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(
-                      Icons.pets_rounded,
-                      size: 32,
-                      color: Color(0xFFB0BEC5))),
+              child: Image.asset(
+                petAsset,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const Icon(
+                    Icons.pets_rounded,
+                    size: 36,
+                    color: Color(0xFFB0BEC5)),
+              ),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,25 +250,37 @@ class _CourseProgressCard extends StatelessWidget {
                     const Text('Course Progress',
                         style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A1A2E))),
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF05354C))),
                     Text('${(percent * 100).toInt()}%',
                         style: const TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFFF5A623))),
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFFF89B29))),
                   ],
                 ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: LinearProgressIndicator(
-                    value: percent,
-                    minHeight: 8,
-                    backgroundColor: const Color(0xFFE2E8F0),
-                    valueColor: const AlwaysStoppedAnimation(
-                        Color(0xFFF5A623)),
-                  ),
+                const SizedBox(height: 10),
+                Stack(
+                  children: [
+                    Container(
+                      height: 10,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE2E8F0),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    FractionallySizedBox(
+                      widthFactor: percent,
+                      child: Container(
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF89B29),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -213,64 +292,113 @@ class _CourseProgressCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// TOPIC 1 CARD — menerima callback onStartLesson
+// TOPIC ACCORDION (Expandable for both Active and Locked)
 // ═══════════════════════════════════════════
-class _Topic1Card extends StatelessWidget {
-  final String petAsset;
-  final VoidCallback onStartLesson;
+class _TopicAccordion extends StatelessWidget {
+  final String title;
+  final int stepCount;
+  final bool isLocked;
+  final bool isExpanded;
+  final VoidCallback onToggle;
+  final VoidCallback? onStartLesson;
 
-  const _Topic1Card(
-      {required this.petAsset, required this.onStartLesson});
+  const _TopicAccordion({
+    required this.title,
+    required this.stepCount,
+    required this.isLocked,
+    required this.isExpanded,
+    required this.onToggle,
+    this.onStartLesson,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 20),
+    final bgColor = isExpanded 
+        ? (isLocked ? Colors.white : const Color(0xFFF2FBFD)) // Terkunci putih, aktif cyan muda
+        : Colors.white;
+    final headerColor = isLocked ? Colors.white : const Color(0xFFE5F8FA);
+    final iconColor = isLocked ? const Color(0xFF94A3B8) : const Color(0xFF004D73);
+    final iconBgColor = isLocked ? const Color(0xFFF1F5F9) : Colors.white;
+    final iconData = isLocked ? Icons.lock_rounded : Icons.menu_book_rounded;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(20),
+        border: isExpanded && !isLocked ? Border.all(color: const Color(0xFFD6F1F8)) : Border.all(color: Colors.transparent),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2)),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 34, height: 34,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A5298).withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.menu_book_rounded,
-                    size: 18, color: Color(0xFF2A5298)),
+          // ── HEADER ──
+          GestureDetector(
+            onTap: onToggle,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: headerColor,
+                borderRadius: isExpanded 
+                    ? const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                    : BorderRadius.circular(20),
               ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Topic 1:  facilisi tellus at blandit. Ac',
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A1A2E))),
-                    SizedBox(height: 2),
-                    Text('5 Steps to level up',
-                        style: TextStyle(
-                            fontSize: 11, color: Color(0xFF6B8499))),
-                  ],
-                ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: iconBgColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(iconData, size: 18, color: iconColor),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            color: isLocked ? const Color(0xFF4A5568) : const Color(0xFF05354C),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '$stepCount Steps to level up',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: isLocked ? const Color(0xFF94A3B8) : const Color(0xFF38D1F5),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-          const SizedBox(height: 20),
-          _ZigzagPath(onStartLesson: onStartLesson),
+
+          // ── ZIGZAG PATH BODY (Hanya muncul jika expanded) ──
+          if (isExpanded)
+            Padding(
+              padding: const EdgeInsets.only(top: 24, bottom: 24),
+              child: _ZigzagPath(
+                isLocked: isLocked,
+                onStartLesson: onStartLesson,
+              ),
+            ),
         ],
       ),
     );
@@ -278,32 +406,43 @@ class _Topic1Card extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// ZIGZAG PATH
+// ZIGZAG PATH (Dinamis: Active / Locked)
 // ═══════════════════════════════════════════
 class _ZigzagPath extends StatelessWidget {
-  final VoidCallback onStartLesson;
-  const _ZigzagPath({required this.onStartLesson});
+  final bool isLocked;
+  final VoidCallback? onStartLesson;
+
+  const _ZigzagPath({required this.isLocked, this.onStartLesson});
 
   @override
   Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width - 32 - 28 - 40;
-    const double rightX = 0.62;
-    const double leftX = 0.12;
-    const double nodeSize = 52.0;
-    const double rowH = 100.0;
+    // Definisi Nodes (5 langkah)
+    final nodes = isLocked
+        ? [
+            const _NodeData(status: 'locked', xFrac: 0.6, label: 'Intro', showStar: false),
+            const _NodeData(status: 'locked', xFrac: 0.2, label: '', showStar: false),
+            const _NodeData(status: 'locked', xFrac: 0.6, label: '', showStar: false),
+            const _NodeData(status: 'locked', xFrac: 0.2, label: '', showStar: false),
+            const _NodeData(status: 'gift_locked', xFrac: 0.5, label: '', showStar: false),
+          ]
+        : [
+            const _NodeData(status: 'done', xFrac: 0.6, label: 'Intro', showStar: true),
+            const _NodeData(status: 'active', xFrac: 0.2, label: '', showStar: false),
+            const _NodeData(status: 'active', xFrac: 0.6, label: '', showStar: false, showStart: true),
+            const _NodeData(status: 'locked', xFrac: 0.2, label: '', showStar: false),
+            const _NodeData(status: 'gift_locked', xFrac: 0.5, label: '', showStar: false),
+          ];
 
-    final nodes = [
-      _NodeData(status: 'done',   xFrac: rightX, label: 'Intro', showStar: true),
-      _NodeData(status: 'active', xFrac: leftX,  label: '',      showStar: false),
-      _NodeData(status: 'locked', xFrac: rightX, label: '',      showStar: false, showStart: true),
-      _NodeData(status: 'locked', xFrac: leftX,  label: '',      showStar: false),
-      _NodeData(status: 'gift',   xFrac: rightX, label: '',      showStar: false),
-    ];
+    final w = MediaQuery.of(context).size.width - 48; // Lebar relatif terhadap layar
+    const double nodeSize = 56.0;
+    const double rowH = 80.0; // Jarak vertikal antar node
 
     return SizedBox(
-      height: rowH * nodes.length - 20,
+      height: rowH * nodes.length - 20, // Total tinggi area zigzag
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
+          // GARIS PUTUS-PUTUS PENGHUBUNG
           Positioned.fill(
             child: CustomPaint(
               painter: _ZigzagPainter(
@@ -314,12 +453,13 @@ class _ZigzagPath extends StatelessWidget {
               ),
             ),
           ),
+          // NODES
           ...nodes.asMap().entries.map((e) {
             final i = e.key;
             final node = e.value;
             return Positioned(
               top: i * rowH,
-              left: node.xFrac * w,
+              left: node.xFrac * w - (nodeSize / 2),
               child: _NodeWidget(
                 node: node,
                 size: nodeSize,
@@ -335,14 +475,15 @@ class _ZigzagPath extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// NODE DATA
+// DATA STRUKTUR NODE
 // ═══════════════════════════════════════════
 class _NodeData {
-  final String status;
+  final String status; // 'done', 'active', 'locked', 'gift_locked'
   final double xFrac;
   final String label;
   final bool showStar;
   final bool showStart;
+
   const _NodeData({
     required this.status,
     required this.xFrac,
@@ -353,7 +494,7 @@ class _NodeData {
 }
 
 // ═══════════════════════════════════════════
-// NODE WIDGET
+// WIDGET SATUAN NODE
 // ═══════════════════════════════════════════
 class _NodeWidget extends StatelessWidget {
   final _NodeData node;
@@ -375,131 +516,150 @@ class _NodeWidget extends StatelessWidget {
     switch (node.status) {
       case 'done':
         inner = Container(
-          width: size, height: size,
+          width: size,
+          height: size,
           decoration: const BoxDecoration(
-            color: Color(0xFF4CAF50),
+            color: Color(0xFF1EA36D),
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                  color: Color(0x554CAF50),
-                  blurRadius: 8,
-                  offset: Offset(0, 3))
-            ],
           ),
-          child: const Icon(Icons.check_rounded,
-              color: Colors.white, size: 26),
+          child: const Icon(Icons.check_rounded, color: Colors.white, size: 28),
         );
         break;
       case 'active':
         inner = Container(
-          width: size, height: size,
+          width: size,
+          height: size,
           decoration: const BoxDecoration(
-            color: Color(0xFF4CAF50),
+            color: Color(0xFF1EA36D),
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                  color: Color(0x554CAF50),
-                  blurRadius: 8,
-                  offset: Offset(0, 3))
-            ],
           ),
           child: Center(
             child: Text('$number',
                 style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.w900,
                     color: Colors.white)),
           ),
         );
         break;
-      case 'gift':
+      case 'gift_locked':
         inner = Container(
-          width: size, height: size,
-          decoration: BoxDecoration(
-            color: Colors.white,
+          width: size,
+          height: size,
+          decoration: const BoxDecoration(
+            color: Color(0xFFF1F5F9), // Light grey
             shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 2),
           ),
-          child: const Center(
-              child: Text('🎁', style: TextStyle(fontSize: 22))),
+          child: const Center(child: Icon(Icons.card_giftcard_rounded, color: Color(0xFF8E24AA), size: 26)),
         );
         break;
-      default:
+      default: // 'locked'
         inner = Container(
-          width: size, height: size,
-          decoration: BoxDecoration(
-            color: Colors.white,
+          width: size,
+          height: size,
+          decoration: const BoxDecoration(
+            color: Color(0xFFE2E8F0), // Grey circle
             shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 2),
           ),
           child: Center(
             child: Text('$number',
                 style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFFB0BEC5))),
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white)),
           ),
         );
     }
 
     return SizedBox(
-      width: size + 80,
+      width: size + 80, // Extra width to allow overlapping elements like Star/Start btn
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          // Core Circle
           inner,
 
+          // Star Badge
           if (node.showStar)
             Positioned(
-              top: -4, right: 18,
-              child: const Text('⭐',
-                  style: TextStyle(fontSize: 14)),
+              top: -6,
+              left: size - 14,
+              child: const Text('⭐', style: TextStyle(fontSize: 18)),
             ),
 
+          // Label text below node
           if (node.label.isNotEmpty)
             Positioned(
-              top: size + 4,
-              left: 0,
-              width: size,
-              child: Text(node.label,
+              top: size + 8,
+              left: -10,
+              width: size + 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)
+                  ]
+                ),
+                child: Text(
+                  node.label,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                      fontSize: 10,
-                      color: Color(0xFF4A5568),
-                      fontWeight: FontWeight.w500)),
+                    fontSize: 11,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
 
-          // ── START BUTTON — navigasi ke LessonScreen ──
+          // Start Button Hover
           if (node.showStart)
             Positioned(
-              top: -4,
-              left: size + 8,
+              top: -10,
+              left: size + 16,
               child: GestureDetector(
                 onTap: onStart,
-                child: Column(
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
                   children: [
+                    // Light orange glow background
                     Container(
-                      width: 52, height: 52,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5A623),
+                      width: 70,
+                      height: 70,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFDEBCC),
                         shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                              color: const Color(0xFFF5A623)
-                                  .withOpacity(0.4),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4)),
-                        ],
                       ),
-                      child: const Icon(Icons.play_arrow_rounded,
-                          color: Colors.white, size: 28),
                     ),
-                    const SizedBox(height: 4),
-                    const Text('Start',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFFF5A623))),
+                    // Inner solid orange play button
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF89B29),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 30),
+                    ),
+                    // Start Label Pill
+                    Positioned(
+                      bottom: -8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF89B29),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: const Text(
+                          'Start',
+                          style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -511,7 +671,7 @@ class _NodeWidget extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// ZIGZAG PAINTER
+// ZIGZAG PAINTER (Garis Putus-Putus / Dashed)
 // ═══════════════════════════════════════════
 class _ZigzagPainter extends CustomPainter {
   final List<_NodeData> nodes;
@@ -529,14 +689,14 @@ class _ZigzagPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paintGreen = Paint()
-      ..color = const Color(0xFF4CAF50)
-      ..strokeWidth = 3
+      ..color = const Color(0xFF1EA36D)
+      ..strokeWidth = 5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    final paintGray = Paint()
-      ..color = const Color(0xFFD1D5DB)
-      ..strokeWidth = 3
+    final paintGrey = Paint()
+      ..color = const Color(0xFFE2E8F0)
+      ..strokeWidth = 5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
@@ -544,10 +704,10 @@ class _ZigzagPainter extends CustomPainter {
       final curr = nodes[i];
       final next = nodes[i + 1];
 
-      final x1 = curr.xFrac * totalWidth + nodeSize / 2;
-      final y1 = i * rowH + nodeSize / 2;
-      final x2 = next.xFrac * totalWidth + nodeSize / 2;
-      final y2 = (i + 1) * rowH + nodeSize / 2;
+      final x1 = curr.xFrac * totalWidth;
+      final y1 = i * rowH + (nodeSize / 2);
+      final x2 = next.xFrac * totalWidth;
+      final y2 = (i + 1) * rowH + (nodeSize / 2);
 
       final path = Path()
         ..moveTo(x1, y1)
@@ -557,14 +717,11 @@ class _ZigzagPainter extends CustomPainter {
           x2, y2,
         );
 
-      final isGreen =
-          curr.status == 'done' || curr.status == 'active';
+      // Logika warna path: Jika node tujuan (next) active/done, maka jalurnya hijau. Selain itu abu-abu.
+      final isGreenPath = next.status == 'done' || next.status == 'active';
+      final selectedPaint = isGreenPath ? paintGreen : paintGrey;
 
-      if (isGreen) {
-        canvas.drawPath(path, paintGreen);
-      } else {
-        _drawDashedPath(canvas, path, paintGray);
-      }
+      _drawDashedPath(canvas, path, selectedPaint);
     }
   }
 
@@ -572,8 +729,8 @@ class _ZigzagPainter extends CustomPainter {
     final metrics = path.computeMetrics();
     for (final metric in metrics) {
       double start = 0;
-      const dashLen = 8.0;
-      const gapLen = 6.0;
+      const dashLen = 10.0;
+      const gapLen = 8.0;
       while (start < metric.length) {
         final end = math.min(start + dashLen, metric.length);
         canvas.drawPath(metric.extractPath(start, end), paint);
@@ -583,64 +740,23 @@ class _ZigzagPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_ZigzagPainter _) => false;
+  bool shouldRepaint(_ZigzagPainter oldDelegate) => false;
 }
 
 // ═══════════════════════════════════════════
-// LOCKED TOPIC CARD
+// CLIPPER: HEADER WAVE
 // ═══════════════════════════════════════════
-class _LockedTopicCard extends StatelessWidget {
-  final String title;
-  final int stepCount;
-  const _LockedTopicCard(
-      {required this.title, required this.stepCount});
-
+class _HeaderWaveClipper extends CustomClipper<Path> {
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 2)),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 34, height: 34,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.lock_rounded,
-                size: 18, color: Color(0xFF94A3B8)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A2E))),
-                const SizedBox(height: 2),
-                Text('$stepCount Steps to level up',
-                    style: const TextStyle(
-                        fontSize: 11, color: Color(0xFF6B8499))),
-              ],
-            ),
-          ),
-          const Icon(Icons.keyboard_arrow_down_rounded,
-              color: Color(0xFF6B8499), size: 22),
-        ],
-      ),
-    );
+  Path getClip(Size size) {
+    Path path = Path();
+    path.lineTo(0, size.height - 30);
+    path.quadraticBezierTo(size.width * 0.25, size.height + 10, size.width * 0.5, size.height - 15);
+    path.quadraticBezierTo(size.width * 0.75, size.height - 40, size.width, size.height - 10);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
   }
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

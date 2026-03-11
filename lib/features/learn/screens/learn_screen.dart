@@ -44,7 +44,7 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
       percent: 0.25,
       progressLabel: 'Continue: Greeting Elders',
       bgColor: Color(0xFF3D6B58),
-      petAsset: AppAssets.petOrangUtanAnak,
+      petAsset: AppAssets.petOrangUtanAnaknobg,
       status: 'progress',
     ),
     _DiscoveryModule(
@@ -76,38 +76,48 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── HEADER ──
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFFB8E4F5), Color(0xFFE8F6FB)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+          // ── HEADER DENGAN WAVE ──
+          ClipPath(
+            clipper: _HeaderWaveClipper(),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 50),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF42E0FF), Color(0xFFF1F9FF), Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  stops: [0.0, 0.6, 1.0],
+                ),
               ),
-            ),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Ready to master a new Native Tongue, John?',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1A1A2E)),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Keeping the vibes alive, one word at a time.',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF6B8499)),
-                ),
-              ],
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ready to master a new Native Tongue, John?',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF05354C),
+                      height: 1.3,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Keeping the vibes alive, one word at a time.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF05354C),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
 
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -156,6 +166,30 @@ class _ModuleDiscoveryPageState extends State<_ModuleDiscoveryPage> {
       ),
     );
   }
+}
+
+// ═══════════════════════════════════════════
+// CUSTOM CLIPPER: WAVE HEADER
+// ═══════════════════════════════════════════
+class _HeaderWaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.lineTo(0, size.height - 30);
+    // Gelombang halus (turun perlahan, lalu naik sedikit)
+    path.quadraticBezierTo(
+        size.width * 0.25, size.height + 10, 
+        size.width * 0.5, size.height - 15);
+    path.quadraticBezierTo(
+        size.width * 0.75, size.height - 40, 
+        size.width, size.height - 10);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
 // ═══════════════════════════════════════════

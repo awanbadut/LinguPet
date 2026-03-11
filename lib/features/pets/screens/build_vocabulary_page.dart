@@ -146,15 +146,15 @@ class _BuildVocabularyPageState extends State<BuildVocabularyPage>
                   ),
                 ),
               ),
-              Positioned(
-                bottom: 20,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Image.asset(AppAssets.petBaby,
-                      height: 180, fit: BoxFit.contain),
-                ),
-              ),
+              // Positioned(
+              //   bottom: 20,
+              //   left: 0,
+              //   right: 0,
+              //   // child: Center(
+              //   //   child: Image.asset(AppAssets.petBaby,
+              //   //       height: 180, fit: BoxFit.contain),
+              //   // ),
+              // ),
               SafeArea(
                 child: Padding(
                   padding:
