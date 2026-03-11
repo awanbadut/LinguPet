@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:lingupet/core/constants/app_assets.dart';
 import 'package:lingupet/features/learn/screens/learn_screen.dart';
 import 'package:lingupet/features/profile/screens/profile_screen.dart';
+import 'package:lingupet/features/pets/screens/pet_detail_screen.dart';
+
+
 
 // ═══════════════════════════════════════════
 // HOME SCREEN (Scaffold utama + BottomNav)
@@ -19,7 +22,16 @@ class _HomeScreenState extends State<HomeScreen> {
   // ── Daftar semua tab screen ──
   static const List<Widget> _screens = [
     _HomeTab(),          // 0 - Home
-    _PetsPlaceholder(),  // 1 - Pets
+     PetDetailScreen(     // 1 - Pets (langsung detail pet aktif)
+    name: 'Kaba The Buffalo',
+    region: 'West Sumatra, Indonesia',
+    asset: AppAssets.petAdult,
+    level: 12,
+    progress: 0.75,
+    hunger: 0.15,
+    happiness: 0.60,
+    energy: 0.40,
+  ),
     LearnScreen(),       // 2 - Learn
     ProfileScreen(),     // 3 - Profile ← terdaftar
   ];

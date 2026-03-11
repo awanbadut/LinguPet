@@ -35,6 +35,7 @@ flutter:
     - assets/asset/flag/
     - assets/asset/maskot/
     - assets/asset/pet/
+    - assets/asset/avatar/
 
   fonts:
     - family: PlusJakartaSans
