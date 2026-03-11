@@ -1,418 +1,515 @@
 import 'package:flutter/material.dart';
 import 'package:lingupet/core/constants/app_assets.dart';
+import 'package:lingupet/features/pets/screens/build_vocabulary_page.dart';
 
 // ═══════════════════════════════════════════
-// PET DETAIL SCREEN
+// DATA MODEL
 // ═══════════════════════════════════════════
-class PetDetailScreen extends StatefulWidget {
+class _Pet {
   final String name;
   final String region;
-  final String asset;
+  final String flag;
+  final String bgAsset;
   final int level;
   final double progress;
   final double hunger;
   final double happiness;
   final double energy;
+  final Color nameColor;
 
-  const PetDetailScreen({
-    super.key,
+  const _Pet({
     required this.name,
     required this.region,
-    required this.asset,
+    required this.flag,
+    required this.bgAsset,
     required this.level,
     required this.progress,
     required this.hunger,
     required this.happiness,
     required this.energy,
+    this.nameColor = const Color(0xFF1A1A1A),
   });
+}
+
+const _petList = [
+  _Pet(
+    name: 'Kaba The Buffalo',
+    region: 'West Sumatra, Indonesia',
+    flag: '🇮🇩',
+    bgAsset: AppAssets.petBabyBg,
+    level: 5,
+    progress: 0.25,
+    hunger: 0.85,
+    happiness: 0.90,
+    energy: 0.75,
+    nameColor: Color(0xFF1A1A1A),
+  ),
+  _Pet(
+    name: 'Oru the Borneo',
+    region: 'Sarawak, Malaysia',
+    flag: '🇲🇾',
+    bgAsset: AppAssets.petOrangUtanAnak,
+    level: 5,
+    progress: 0.25,
+    hunger: 0.85,
+    happiness: 0.90,
+    energy: 0.75,
+    nameColor: Colors.white,
+  ),
+];
+
+// total halaman = pet + 1 halaman "Raise Another Pet"
+final _totalPages = _petList.length + 1;
+
+// ═══════════════════════════════════════════
+// PET DETAIL SCREEN
+// ═══════════════════════════════════════════
+class PetDetailScreen extends StatefulWidget {
+  const PetDetailScreen({super.key});
 
   @override
   State<PetDetailScreen> createState() => _PetDetailScreenState();
 }
 
 class _PetDetailScreenState extends State<PetDetailScreen> {
-  // State lokal untuk simulasi perubahan stats
-  late double _hunger;
-  late double _happiness;
-  late double _energy;
+  final _ctrl = PageController();
+  int _current = 0;
+
+  late List<double> _hunger;
+  late List<double> _happiness;
+  late List<double> _energy;
 
   @override
   void initState() {
     super.initState();
-    _hunger = widget.hunger;
-    _happiness = widget.happiness;
-    _energy = widget.energy;
+    _hunger = _petList.map((p) => p.hunger).toList();
+    _happiness = _petList.map((p) => p.happiness).toList();
+    _energy = _petList.map((p) => p.energy).toList();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFDE4D3),
-              Color(0xFFD4E8F5),
-            ],
+    return Stack(
+      children: [
+        // ── Swipeable pages ──
+        PageView.builder(
+          controller: _ctrl,
+          itemCount: _totalPages,
+          onPageChanged: (i) => setState(() => _current = i),
+          itemBuilder: (_, i) {
+            // Halaman terakhir = Raise Another Pet
+            if (i == _petList.length) {
+              return _RaiseAnotherPetPage(
+                onTap: () {
+                  // TODO: navigasi ke halaman pilih pet baru
+                },
+              );
+            }
+            // Halaman pet normal
+            return _PetPage(
+              pet: _petList[i],
+              hunger: _hunger[i],
+              happiness: _happiness[i],
+              energy: _energy[i],
+              onFeed: (dH, dHa, dE) => setState(() {
+                _hunger[i] = (_hunger[i] + dH).clamp(0.0, 1.0);
+                _happiness[i] = (_happiness[i] + dHa).clamp(0.0, 1.0);
+                _energy[i] = (_energy[i] + dE).clamp(0.0, 1.0);
+              }),
+            );
+          },
+        ),
+
+        // ── Dot indicators ──
+        Positioned(
+          bottom: 16,
+          left: 0,
+          right: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_totalPages, (i) {
+              final active = i == _current;
+              final isLast = i == _petList.length;
+              return GestureDetector(
+                onTap: () => _ctrl.animateToPage(
+                  i,
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeInOut,
+                ),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: active ? 22 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: active
+                        ? (isLast
+                            ? const Color(
+                                0xFFFDB913) // dot aktif kuning di halaman raise
+                            : Colors.white)
+                        : (isLast
+                            ? const Color(0xFFFDB913).withOpacity(0.4)
+                            : Colors.white.withOpacity(0.45)),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              );
+            }),
           ),
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════
+// RAISE ANOTHER PET PAGE
+// ═══════════════════════════════════════════
+class _RaiseAnotherPetPage extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _RaiseAnotherPetPage({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFFB8E4F5),
+            Color(0xFFD6EFF8),
+            Color(0xFFEAF6FC),
+          ],
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // ── Wave top ──
+            ClipPath(
+              clipper: _WaveClipper(),
+              child: Container(
+                height: 40,
+                color: const Color(0xFF9AD8F0).withOpacity(0.5),
+              ),
+            ),
+
+            const Spacer(flex: 1),
+
+            // ── Maskot binggung ──
+            Image.asset(
+              AppAssets.binggung,
+              width: 260,
+              height: 280,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => const Text(
+                '🐻',
+                style: TextStyle(fontSize: 120),
+              ),
+            ),
+
+            const Spacer(flex: 1),
+
+            // ── Teks ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 16),
-
-                  // ── Top bar ──
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Detail badge (kiri)
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.info_outline_rounded,
-                                color: Color(0xFF0066CC), size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              'Detail',
-                              style: TextStyle(
-                                color: Color(0xFF0066CC),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Level badge (kanan)
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.trending_up_rounded,
-                                color: Color(0xFF333333), size: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Level ${widget.level}',
-                              style: const TextStyle(
-                                color: Color(0xFF333333),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // ── Nama & Lokasi ──
-                  Text(
-                    widget.name,
-                    style: const TextStyle(
+                  const Text(
+                    'Raise Another Pet',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
                       fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1A1A),
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFFF5A623),
+                      letterSpacing: 0.3,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_rounded,
-                          size: 16, color: Color(0xFF666666)),
-                      const SizedBox(width: 4),
-                      Text(
-                        widget.region,
-                        style: const TextStyle(
-                            fontSize: 14, color: Color(0xFF666666)),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // ── Stat Cards ──
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          icon: '🍽️',
-                          label: 'Hunger',
-                          value: _hunger,
-                          barColor: const Color(0xFFFF9800),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          icon: '❤️',
-                          label: 'Happiness',
-                          value: _happiness,
-                          barColor: const Color(0xFFE91E63),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          icon: '⚡',
-                          label: 'Energy',
-                          value: _energy,
-                          barColor: const Color(0xFF00A8CC),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // ── Pet Image ──
-                  Center(
-                    child: SizedBox(
-                      width: 220,
-                      height: 260,
-                      child: Image.asset(
-                        widget.asset,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.pets_rounded,
-                          size: 120,
-                          color: Color(0xFFB0BEC5),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // ── Action Buttons ──
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildActionButton(
-                          icon: '🍖',
-                          label: 'Feed',
-                          backgroundColor: const Color(0xFFFDB913),
-                          textColor: Colors.white,
-                          onTap: () => _showFeedSheet(),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildActionButton(
-                          icon: '📚',
-                          label: 'Vocabulary',
-                          backgroundColor: Colors.white,
-                          textColor: const Color(0xFF1A2E4A),
-                          onTap: () {},
-                        ),
-                      ),
-                    ],
-                  ),
-
                   const SizedBox(height: 16),
-
-                  // ── Level Progress ──
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Level Progress',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1A1A1A),
-                              ),
-                            ),
-                            Text(
-                              '${(widget.progress * 100).toInt()}%',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFFFF6B6B),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: LinearProgressIndicator(
-                            value: widget.progress,
-                            minHeight: 12,
-                            backgroundColor: const Color(0xFFE5E5E5),
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              const Color(0xFFFDB913).withOpacity(0.8),
-                            ),
-                          ),
-                        ),
-                      ],
+                  const Text(
+                    'Grow another pet and help introduce and develop local languages together. Each pet represents a regional language you can learn, practice, and share with others. By raising more pets, you help keep these languages alive and connect with different cultures.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF4A6070),
+                      height: 1.6,
                     ),
                   ),
-
-                  const SizedBox(height: 32),
                 ],
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  // ── Stat Card ──
-  Widget _buildStatCard({
-    required String icon,
-    required String label,
-    required double value,
-    required Color barColor,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 24)),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF666666),
-            ),
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: value,
-              minHeight: 8,
-              backgroundColor: const Color(0xFFE5E5E5),
-              valueColor: AlwaysStoppedAnimation<Color>(barColor),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '${(value * 100).toInt()}%',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A1A),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+            const Spacer(flex: 2),
 
-  // ── Action Button ──
-  Widget _buildActionButton({
-    required String icon,
-    required String label,
-    required Color backgroundColor,
-    required Color textColor,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Column(
-          children: [
-            Text(icon, style: const TextStyle(fontSize: 32)),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: textColor,
+            // ── CTA Button ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: onTap,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF5A623),
+                    foregroundColor: Colors.white,
+                    elevation: 6,
+                    shadowColor: const Color(0xFFF5A623).withOpacity(0.4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  child: const Text(
+                    "Let's Raise Another Pet",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
               ),
             ),
+
+            const SizedBox(height: 48), // ruang untuk dot indicator
           ],
         ),
       ),
     );
   }
+}
 
-  // ── Feed Bottom Sheet ──
-  void _showFeedSheet() {
+// ═══════════════════════════════════════════
+// SINGLE PET PAGE
+// ═══════════════════════════════════════════
+class _PetPage extends StatelessWidget {
+  final _Pet pet;
+  final double hunger;
+  final double happiness;
+  final double energy;
+  final void Function(double dH, double dHa, double dE) onFeed;
+
+  const _PetPage({
+    required this.pet,
+    required this.hunger,
+    required this.happiness,
+    required this.energy,
+    required this.onFeed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = pet.nameColor == Colors.white;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          pet.bgAsset,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [const Color(0xFF1A3A2A), const Color(0xFF2D5A3D)]
+                    : [const Color(0xFFFDE4D3), const Color(0xFFFFD6E0)],
+              ),
+            ),
+          ),
+        ),
+        SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _TopPill(
+                      icon: Icons.remove_red_eye_outlined,
+                      label: 'Detail',
+                      iconColor: const Color(0xFF0066CC),
+                      textColor: const Color(0xFF0066CC),
+                    ),
+                    _TopPill(
+                      icon: Icons.emoji_events_outlined,
+                      label: 'Level ${pet.level}',
+                      iconColor: const Color(0xFF333333),
+                      textColor: const Color(0xFF333333),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                pet.name,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: pet.nameColor,
+                  shadows: const [
+                    Shadow(
+                        color: Colors.black26,
+                        blurRadius: 8,
+                        offset: Offset(0, 2)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(pet.flag, style: const TextStyle(fontSize: 16)),
+                  const SizedBox(width: 5),
+                  Text(
+                    pet.region,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: pet.nameColor.withOpacity(0.9),
+                      shadows: const [
+                        Shadow(color: Colors.black26, blurRadius: 6)
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: _StatCard(
+                            icon: Icons.local_fire_department_rounded,
+                            iconColor: const Color(0xFFFF9800),
+                            label: 'Hunger',
+                            value: hunger,
+                            barColor: const Color(0xFFFF9800))),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: _StatCard(
+                            icon: Icons.favorite_rounded,
+                            iconColor: const Color(0xFFE91E63),
+                            label: 'Hapinnes',
+                            value: happiness,
+                            barColor: const Color(0xFFE91E63))),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: _StatCard(
+                            icon: Icons.bolt_rounded,
+                            iconColor: const Color(0xFF00A8CC),
+                            label: 'Energy',
+                            value: energy,
+                            barColor: const Color(0xFF00A8CC))),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 48),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        // SESUDAH
+Expanded(child: _ActionButton(
+  icon: Icons.apple_rounded,
+  emoji: '🍎',
+  label: 'Feed',
+  bgColor: const Color(0xFFFDB913),
+  textColor: Colors.white,
+  onTap: () => Navigator.push(           // ← jadi ini
+    context,
+    MaterialPageRoute(
+      builder: (_) => const BuildVocabularyPage(),
+    ),
+  ),
+)),
+
+                        const SizedBox(width: 12),
+                        Expanded(
+                            child: _ActionButton(
+                                icon: Icons.menu_book_rounded,
+                                emoji: '📖',
+                                label: 'Vocabulary',
+                                bgColor: const Color(0xFF1A3A5C),
+                                textColor: Colors.white,
+                                onTap: () {})),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3))
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Level Progress',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF1A1A1A))),
+                              Text('${(pet.progress * 100).toInt()}%',
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFFFF6B6B))),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: LinearProgressIndicator(
+                              value: pet.progress,
+                              minHeight: 10,
+                              backgroundColor: const Color(0xFFE5E5E5),
+                              valueColor: const AlwaysStoppedAnimation(
+                                  Color(0xFFFDB913)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showFeedSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -420,97 +517,65 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
             Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE2E8F0),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                    color: const Color(0xFFE2E8F0),
+                    borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 18),
+            Text('Feed ${pet.name.split(' ').first}',
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF011E2F))),
+            const SizedBox(height: 4),
+            const Text('Choose a food item to feed your pet',
+                style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
             const SizedBox(height: 20),
-
-            Text(
-              'Feed ${widget.name.split(' ').first}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF011E2F),
-              ),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Choose a food item to feed your pet',
-              style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-            ),
-            const SizedBox(height: 20),
-
-            // Food items
             Row(
               children: [
                 Expanded(
-                  child: _FoodItem(
-                    emoji: '🍖',
-                    name: 'Meat',
-                    xp: '+15 XP',
-                    onTap: () {
-                      setState(() {
-                        _hunger = (_hunger + 0.3).clamp(0.0, 1.0);
-                        _happiness = (_happiness + 0.1).clamp(0.0, 1.0);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 10),
+                    child: _FoodItem(
+                        emoji: '🍖',
+                        name: 'Meat',
+                        xp: '+15 XP',
+                        onTap: () {
+                          onFeed(0.30, 0.10, 0.00);
+                          Navigator.pop(context);
+                        })),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: _FoodItem(
-                    emoji: '🌾',
-                    name: 'Grain',
-                    xp: '+8 XP',
-                    onTap: () {
-                      setState(() {
-                        _hunger = (_hunger + 0.15).clamp(0.0, 1.0);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 10),
+                    child: _FoodItem(
+                        emoji: '🌾',
+                        name: 'Grain',
+                        xp: '+8 XP',
+                        onTap: () {
+                          onFeed(0.15, 0.00, 0.00);
+                          Navigator.pop(context);
+                        })),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: _FoodItem(
-                    emoji: '🍎',
-                    name: 'Fruit',
-                    xp: '+10 XP',
-                    onTap: () {
-                      setState(() {
-                        _hunger = (_hunger + 0.2).clamp(0.0, 1.0);
-                        _energy = (_energy + 0.1).clamp(0.0, 1.0);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 10),
+                    child: _FoodItem(
+                        emoji: '🍎',
+                        name: 'Fruit',
+                        xp: '+10 XP',
+                        onTap: () {
+                          onFeed(0.20, 0.05, 0.10);
+                          Navigator.pop(context);
+                        })),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: _FoodItem(
-                    emoji: '🫙',
-                    name: 'Premium',
-                    xp: '+30 XP',
-                    onTap: () {
-                      setState(() {
-                        _hunger = (_hunger + 0.5).clamp(0.0, 1.0);
-                        _happiness = (_happiness + 0.3).clamp(0.0, 1.0);
-                        _energy = (_energy + 0.2).clamp(0.0, 1.0);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
+                    child: _FoodItem(
+                        emoji: '🫙',
+                        name: 'Premium',
+                        xp: '+30 XP',
+                        onTap: () {
+                          onFeed(0.50, 0.30, 0.20);
+                          Navigator.pop(context);
+                        })),
               ],
             ),
-            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -519,20 +584,187 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 }
 
 // ═══════════════════════════════════════════
-// FOOD ITEM WIDGET
+// WAVE CLIPPER
 // ═══════════════════════════════════════════
+class _WaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, 0);
+    path.quadraticBezierTo(
+        size.width * 0.25, size.height, size.width * 0.5, size.height * 0.5);
+    path.quadraticBezierTo(size.width * 0.75, 0, size.width, size.height * 0.6);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> old) => false;
+}
+
+// ═══════════════════════════════════════════
+// REUSABLE WIDGETS
+// ═══════════════════════════════════════════
+class _TopPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color iconColor;
+  final Color textColor;
+
+  const _TopPill(
+      {required this.icon,
+      required this.label,
+      required this.iconColor,
+      required this.textColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 8,
+              offset: const Offset(0, 2))
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: iconColor),
+          const SizedBox(width: 6),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final double value;
+  final Color barColor;
+
+  const _StatCard(
+      {required this.icon,
+      required this.iconColor,
+      required this.label,
+      required this.value,
+      required this.barColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.92),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 6,
+              offset: const Offset(0, 2))
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Icon(icon, size: 16, color: iconColor),
+            const SizedBox(width: 4),
+            Text(label,
+                style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF555555)))
+          ]),
+          const SizedBox(height: 8),
+          ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                  value: value,
+                  minHeight: 7,
+                  backgroundColor: const Color(0xFFE5E5E5),
+                  valueColor: AlwaysStoppedAnimation(barColor))),
+          const SizedBox(height: 5),
+          Text('${(value * 100).toInt()}%',
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1A1A))),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String emoji;
+  final String label;
+  final Color bgColor;
+  final Color textColor;
+  final VoidCallback onTap;
+
+  const _ActionButton(
+      {required this.icon,
+      required this.emoji,
+      required this.label,
+      required this.bgColor,
+      required this.textColor,
+      required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+                color: bgColor.withOpacity(0.4),
+                blurRadius: 10,
+                offset: const Offset(0, 4))
+          ],
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 30)),
+            const SizedBox(height: 6),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: textColor)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _FoodItem extends StatelessWidget {
   final String emoji;
   final String name;
   final String xp;
   final VoidCallback onTap;
 
-  const _FoodItem({
-    required this.emoji,
-    required this.name,
-    required this.xp,
-    required this.onTap,
-  });
+  const _FoodItem(
+      {required this.emoji,
+      required this.name,
+      required this.xp,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -543,29 +775,23 @@ class _FoodItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFFF8FAFC),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
         child: Column(
           children: [
             Text(emoji, style: const TextStyle(fontSize: 26)),
             const SizedBox(height: 4),
-            Text(
-              name,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF334155),
-              ),
-            ),
+            Text(name,
+                style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF334155))),
             const SizedBox(height: 2),
-            Text(
-              xp,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF10B981),
-              ),
-            ),
+            Text(xp,
+                style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF10B981))),
           ],
         ),
       ),

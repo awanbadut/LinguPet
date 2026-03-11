@@ -5,8 +5,6 @@ import 'package:lingupet/features/learn/screens/learn_screen.dart';
 import 'package:lingupet/features/profile/screens/profile_screen.dart';
 import 'package:lingupet/features/pets/screens/pet_detail_screen.dart';
 
-
-
 // ═══════════════════════════════════════════
 // HOME SCREEN (Scaffold utama + BottomNav)
 // ═══════════════════════════════════════════
@@ -21,19 +19,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ── Daftar semua tab screen ──
   static const List<Widget> _screens = [
-    _HomeTab(),          // 0 - Home
-     PetDetailScreen(     // 1 - Pets (langsung detail pet aktif)
-    name: 'Kaba The Buffalo',
-    region: 'West Sumatra, Indonesia',
-    asset: AppAssets.petAdult,
-    level: 12,
-    progress: 0.75,
-    hunger: 0.15,
-    happiness: 0.60,
-    energy: 0.40,
-  ),
-    LearnScreen(),       // 2 - Learn
-    ProfileScreen(),     // 3 - Profile ← terdaftar
+    _HomeTab(),
+    PetDetailScreen(), // 0 - Home
+    LearnScreen(), // 2 - Learn
+    ProfileScreen(), // 3 - Profile ← terdaftar
   ];
 
   @override
@@ -86,7 +75,6 @@ class _HomeTab extends StatelessWidget {
         children: [
           const _TopBar(),
           const SizedBox(height: 16),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _SectionHeader(title: 'Your Pet', onSeeAll: () {}),
@@ -96,9 +84,7 @@ class _HomeTab extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: _PetCard(),
           ),
-
           const SizedBox(height: 24),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _SectionHeader(title: 'Learning Track', onSeeAll: () {}),
@@ -156,7 +142,8 @@ class _TopBar extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 42, height: 42,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: const Color(0xFF38D1F5), width: 2),
@@ -166,8 +153,8 @@ class _TopBar extends StatelessWidget {
               child: Image.asset(
                 AppAssets.petAdult,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(
-                    Icons.person, color: Color(0xFFF5A623), size: 24),
+                errorBuilder: (_, __, ___) => const Icon(Icons.person,
+                    color: Color(0xFFF5A623), size: 24),
               ),
             ),
           ),
@@ -182,13 +169,13 @@ class _TopBar extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF1A1A2E))),
                 Text('Keeping the vibes alive, one word at a time.',
-                    style: TextStyle(
-                        fontSize: 11.5, color: Color(0xFF6B8499))),
+                    style: TextStyle(fontSize: 11.5, color: Color(0xFF6B8499))),
               ],
             ),
           ),
           Container(
-            width: 38, height: 38,
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -206,9 +193,11 @@ class _TopBar extends StatelessWidget {
                       size: 20, color: Color(0xFF1A1A2E)),
                 ),
                 Positioned(
-                  right: 8, top: 8,
+                  right: 8,
+                  top: 8,
                   child: Container(
-                    width: 8, height: 8,
+                    width: 8,
+                    height: 8,
                     decoration: const BoxDecoration(
                         color: Color(0xFFF5A623), shape: BoxShape.circle),
                   ),
@@ -249,7 +238,8 @@ class _PetCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: 110, height: 130,
+                  width: 110,
+                  height: 130,
                   child: Stack(
                     clipBehavior: Clip.none,
                     alignment: Alignment.bottomCenter,
@@ -257,7 +247,8 @@ class _PetCard extends StatelessWidget {
                       Positioned(
                         bottom: 0,
                         child: Container(
-                          width: 110, height: 110,
+                          width: 110,
+                          height: 110,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: const Color(0xFFFFF8EC),
@@ -271,10 +262,11 @@ class _PetCard extends StatelessWidget {
                         bottom: 0,
                         child: Image.asset(
                           AppAssets.petAdult,
-                          width: 105, height: 125,
+                          width: 105,
+                          height: 125,
                           fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => const Icon(
-                              Icons.pets, size: 90, color: Color(0xFFF5A623)),
+                          errorBuilder: (_, __, ___) => const Icon(Icons.pets,
+                              size: 90, color: Color(0xFFF5A623)),
                         ),
                       ),
                     ],
@@ -325,8 +317,7 @@ class _PetCard extends StatelessWidget {
                                       color: Color(0xFF1A1A2E))),
                               Text('West Sumatra, Indonesia',
                                   style: TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF6B8499))),
+                                      fontSize: 11, color: Color(0xFF6B8499))),
                             ],
                           ),
                         ],
@@ -351,34 +342,34 @@ class _PetCard extends StatelessWidget {
               ],
             ),
           ),
-
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               children: [
-                Expanded(child: _StatCard(
-                    icon: Icons.favorite_outline_rounded,
-                    iconColor: Color(0xFFEF5350),
-                    label: 'Lapar',
-                    percent: 0.15)),
+                Expanded(
+                    child: _StatCard(
+                        icon: Icons.favorite_outline_rounded,
+                        iconColor: Color(0xFFEF5350),
+                        label: 'Lapar',
+                        percent: 0.15)),
                 SizedBox(width: 8),
-                Expanded(child: _StatCard(
-                    icon: Icons.favorite_outline_rounded,
-                    iconColor: Color(0xFFEF5350),
-                    label: 'Senang',
-                    percent: 0.10)),
+                Expanded(
+                    child: _StatCard(
+                        icon: Icons.favorite_outline_rounded,
+                        iconColor: Color(0xFFEF5350),
+                        label: 'Senang',
+                        percent: 0.10)),
                 SizedBox(width: 8),
-                Expanded(child: _StatCard(
-                    icon: Icons.bolt_rounded,
-                    iconColor: Color(0xFF38D1F5),
-                    label: 'Energi',
-                    percent: 0.02)),
+                Expanded(
+                    child: _StatCard(
+                        icon: Icons.bolt_rounded,
+                        iconColor: Color(0xFF38D1F5),
+                        label: 'Energi',
+                        percent: 0.02)),
               ],
             ),
           ),
-
           const SizedBox(height: 16),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -392,8 +383,8 @@ class _PetCard extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF1A1A2E))),
                     Text('75% to Next Evolution',
-                        style: TextStyle(
-                            fontSize: 11, color: Color(0xFF38D1F5))),
+                        style:
+                            TextStyle(fontSize: 11, color: Color(0xFF38D1F5))),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -403,16 +394,13 @@ class _PetCard extends StatelessWidget {
                     value: 0.75,
                     minHeight: 10,
                     backgroundColor: Color(0xFFE8F0F7),
-                    valueColor:
-                        AlwaysStoppedAnimation(Color(0xFFF5A623)),
+                    valueColor: AlwaysStoppedAnimation(Color(0xFFF5A623)),
                   ),
                 ),
               ],
             ),
           ),
-
           const SizedBox(height: 16),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: SizedBox(
@@ -424,14 +412,13 @@ class _PetCard extends StatelessWidget {
                   backgroundColor: const Color(0xFFF5A623),
                   foregroundColor: Colors.white,
                   elevation: 4,
-                  shadowColor:
-                      const Color(0xFFF5A623).withOpacity(0.4),
+                  shadowColor: const Color(0xFFF5A623).withOpacity(0.4),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25)),
                 ),
                 child: const Text('Quick Feed',
-                    style: TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.w700)),
+                    style:
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
               ),
             ),
           ),
@@ -486,8 +473,7 @@ class _StatCard extends StatelessWidget {
               value: percent,
               minHeight: 5,
               backgroundColor: const Color(0xFFE8F0F7),
-              valueColor:
-                  const AlwaysStoppedAnimation(Color(0xFFEF5350)),
+              valueColor: const AlwaysStoppedAnimation(Color(0xFFEF5350)),
             ),
           ),
           const SizedBox(height: 4),
@@ -541,17 +527,15 @@ class _LearningTrackCard extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 64, height: 64,
+            width: 64,
+            height: 64,
             child: CustomPaint(
-              painter: _CircularProgressPainter(
-                  percent: percent, color: color),
+              painter: _CircularProgressPainter(percent: percent, color: color),
               child: Center(
                 child: Text(
                   '${(percent * 100).toInt()}%',
                   style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: color),
+                      fontSize: 13, fontWeight: FontWeight.w800, color: color),
                 ),
               ),
             ),
@@ -578,8 +562,8 @@ class _LearningTrackCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 7),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1A2A4A),
                     borderRadius: BorderRadius.circular(10),
@@ -645,8 +629,7 @@ class _CircularProgressPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_CircularProgressPainter old) =>
-      old.percent != percent;
+  bool shouldRepaint(_CircularProgressPainter old) => old.percent != percent;
 }
 
 // ═══════════════════════════════════════════
@@ -703,10 +686,30 @@ class _BottomNav extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _NavItem(icon: Icons.home_rounded,          label: 'Home',    index: 0, current: current, onTap: onTap),
-          _NavItem(icon: Icons.pets_rounded,           label: 'Pets',    index: 1, current: current, onTap: onTap),
-          _NavItem(icon: Icons.book_outlined,          label: 'Learn',   index: 2, current: current, onTap: onTap),
-          _NavItem(icon: Icons.person_outline_rounded, label: 'Profile', index: 3, current: current, onTap: onTap),
+          _NavItem(
+              icon: Icons.home_rounded,
+              label: 'Home',
+              index: 0,
+              current: current,
+              onTap: onTap),
+          _NavItem(
+              icon: Icons.pets_rounded,
+              label: 'Pets',
+              index: 1,
+              current: current,
+              onTap: onTap),
+          _NavItem(
+              icon: Icons.book_outlined,
+              label: 'Learn',
+              index: 2,
+              current: current,
+              onTap: onTap),
+          _NavItem(
+              icon: Icons.person_outline_rounded,
+              label: 'Profile',
+              index: 3,
+              current: current,
+              onTap: onTap),
         ],
       ),
     );
@@ -740,8 +743,8 @@ class _NavItem extends StatelessWidget {
           children: [
             if (isActive)
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE8F6FB),
                   borderRadius: BorderRadius.circular(20),

@@ -1,10 +1,10 @@
 name: lingupet
 description: "LinguPet - Preserve Language Through Play"
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.2.0 <4.0.0'
+  sdk: ">=3.2.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -22,6 +22,9 @@ dependencies:
   # UI
   gap: ^3.0.1
   # video_player: ^2.8.3
+
+  record: ^6.0.0
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:
