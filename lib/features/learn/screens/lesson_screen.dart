@@ -142,7 +142,8 @@ class _TopBar extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF05354C)),
+              child: const Icon(Icons.close_rounded,
+                  size: 20, color: Color(0xFF05354C)),
             ),
           ),
           const SizedBox(width: 16),
@@ -177,7 +178,8 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 16),
           Row(
             children: [
-              const Icon(Icons.favorite_rounded, color: Color(0xFFE23D3D), size: 24),
+              const Icon(Icons.favorite_rounded,
+                  color: Color(0xFFE23D3D), size: 24),
               const SizedBox(width: 6),
               Text(
                 '$lives',
@@ -215,46 +217,45 @@ class _Task1Translate extends StatefulWidget {
 }
 
 class _Task1TranslateState extends State<_Task1Translate> {
-  static const _correctAnswer = ['I', 'am', 'Hunggry'];
+  static const correctAnswer = ['I', 'am', 'Hungry'];
 
-  // ✅ Word bank 6 kata → tampil 3x2 (GridView 3 kolom)
-  final List<String> _wordBank = ['I', 'you', 'Hunggry', 'Happy', 'am', 'Sad'];
-  final List<String> _dropped = [];
-  bool? _checked;
+  final List<String> wordBank = ['I', 'you', 'Hungry', 'Happy', 'am', 'Sad'];
+  final List<String> dropped = [];
+  bool? checked;
 
-  void _tapWord(String word) {
-    if (_checked != null) return;
-    setState(() => _dropped.add(word));
+  void tapWord(String word) {
+    if (checked != null) return;
+    setState(() => dropped.add(word));
   }
 
-  void _removeWord(int idx) {
-    if (_checked != null) return;
-    setState(() => _dropped.removeAt(idx));
+  void removeWord(int idx) {
+    if (checked != null) return;
+    setState(() => dropped.removeAt(idx));
   }
 
-  void _check() {
-    if (_dropped.isEmpty) return;
-    final isCorrect = _dropped.length == _correctAnswer.length &&
-        List.generate(_dropped.length, (i) => _dropped[i] == _correctAnswer[i])
+  void check() {
+    if (dropped.isEmpty) return;
+    final isCorrect = dropped.length == correctAnswer.length &&
+        List.generate(dropped.length, (i) => dropped[i] == correctAnswer[i])
             .every((e) => e);
-    setState(() => _checked = isCorrect);
+    setState(() => checked = isCorrect);
     if (!isCorrect) widget.onWrong();
   }
 
-  void _next() {
-    if (_checked == true) {
+  void next() {
+    if (checked == true) {
       widget.onComplete();
     } else {
       setState(() {
-        _checked = null;
-        _dropped.clear();
+        checked = null;
+        dropped.clear();
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final droppedCopy = List<String>.from(_dropped);
+    final droppedCopy = List<String>.from(dropped);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,19 +274,25 @@ class _Task1TranslateState extends State<_Task1Translate> {
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 24),
-                _QuestionCard(petAsset: widget.petAsset, word: 'Ambo Lapa'),
+
                 const SizedBox(height: 24),
 
-                // DROP ZONE
+                _QuestionCard(
+                  petAsset: widget.petAsset,
+                  word: 'Ambo Lapa',
+                ),
+
+                const SizedBox(height: 24),
+
+                // ── DROP ZONE ──
                 CustomPaint(
                   painter: _DashedRectPainter(),
                   child: Container(
                     width: double.infinity,
-                    constraints: const BoxConstraints(minHeight: 72),
-                    padding: const EdgeInsets.all(14),
+                    height: 72,
+                    // ✅ center: "Tap words below" di tengah
                     alignment: Alignment.center,
-                    child: _dropped.isEmpty
+                    child: dropped.isEmpty
                         ? const Text(
                             'Tap words below',
                             style: TextStyle(
@@ -294,39 +301,54 @@ class _Task1TranslateState extends State<_Task1Translate> {
                               fontWeight: FontWeight.w600,
                             ),
                           )
-                        : Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: _dropped.asMap().entries.map((e) {
-                              return GestureDetector(
-                                onTap: () => _removeWord(e.key),
-                                child: _WordPill(word: e.value, isSelected: true),
-                              );
-                            }).toList(),
+                        // ✅ kata muncul ke samping dengan scroll horizontal
+                        : SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: dropped
+                                  .asMap()
+                                  .entries
+                                  .map(
+                                    (e) => Padding(
+                                      padding: const EdgeInsets.only(right: 8),
+                                      child: GestureDetector(
+                                        onTap: () => removeWord(e.key),
+                                        child: _WordPill(
+                                          word: e.value,
+                                          isSelected: true,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
                           ),
                   ),
                 ),
 
                 const SizedBox(height: 32),
 
-                // ✅ WORD BANK — Grid 3 kolom agar sejajar 3x2
+                // ── WORD BANK — Grid 3 kolom ──
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                     childAspectRatio: 2.2,
                   ),
-                  itemCount: _wordBank.length,
+                  itemCount: wordBank.length,
                   itemBuilder: (_, idx) {
-                    final w = _wordBank[idx];
+                    final w = wordBank[idx];
                     final tempCopy = List<String>.from(droppedCopy);
                     final isUsed = tempCopy.remove(w);
-
                     return GestureDetector(
-                      onTap: isUsed ? null : () => _tapWord(w),
+                      onTap: isUsed ? null : () => tapWord(w),
                       child: Opacity(
                         opacity: isUsed ? 0.3 : 1.0,
                         child: _WordPill(word: w, isSelected: false),
@@ -340,12 +362,13 @@ class _Task1TranslateState extends State<_Task1Translate> {
             ),
           ),
         ),
+
         _BottomActionArea(
-          enabled: _dropped.isNotEmpty,
-          checked: _checked,
-          onCheck: _check,
-          onNext: _next,
-          rightAnswer: 'I am Hunggry',
+          enabled: dropped.isNotEmpty,
+          checked: checked,
+          onCheck: check,
+          onNext: next,
+          rightAnswer: 'I am Hungry',
         ),
       ],
     );
@@ -406,7 +429,6 @@ class _Task2SelectImageState extends State<_Task2SelectImage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ✅ FIX OVERFLOW: Expanded + SingleChildScrollView
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -424,11 +446,11 @@ class _Task2SelectImageState extends State<_Task2SelectImage> {
                 const SizedBox(height: 24),
                 _QuestionCard(petAsset: widget.petAsset, word: 'Dapua'),
                 const SizedBox(height: 32),
-
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
@@ -438,7 +460,6 @@ class _Task2SelectImageState extends State<_Task2SelectImage> {
                   itemBuilder: (_, i) {
                     final opt = _options[i];
                     final isSelected = _selected == i;
-
                     return GestureDetector(
                       onTap: _checked != null
                           ? null
@@ -456,7 +477,8 @@ class _Task2SelectImageState extends State<_Task2SelectImage> {
                           boxShadow: [
                             if (isSelected)
                               BoxShadow(
-                                color: const Color(0xFF00334E).withOpacity(0.1),
+                                color:
+                                    const Color(0xFF00334E).withOpacity(0.1),
                                 blurRadius: 10,
                                 spreadRadius: 2,
                               ),
@@ -465,7 +487,8 @@ class _Task2SelectImageState extends State<_Task2SelectImage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(opt['emoji']!, style: const TextStyle(fontSize: 48)),
+                            Text(opt['emoji']!,
+                                style: const TextStyle(fontSize: 48)),
                             const SizedBox(height: 12),
                             Text(
                               opt['label']!,
@@ -476,7 +499,8 @@ class _Task2SelectImageState extends State<_Task2SelectImage> {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Icon(Icons.volume_up, size: 18, color: Color(0xFF05354C)),
+                            const Icon(Icons.volume_up,
+                                size: 18, color: Color(0xFF05354C)),
                           ],
                         ),
                       ),
@@ -523,7 +547,7 @@ class _Task3PairWordsState extends State<_Task3PairWords> {
     'Home': 'Rumah',
     'Dapua': 'Kitchen',
     'Jawi': 'Cow',
-    'Hunggry': 'Lapa',
+    'Hungry': 'Lapa',
   };
 
   late final List<String> _leftWords;
@@ -590,43 +614,40 @@ class _Task3PairWordsState extends State<_Task3PairWords> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // LEFT COLUMN
                     Expanded(
                       child: Column(
                         children: _leftWords.asMap().entries.map((e) {
                           final isMatched = _matched.containsKey(e.key);
                           return GestureDetector(
-                            onTap: isMatched ? null : () => _selectLeft(e.key),
+                            onTap: isMatched
+                                ? null
+                                : () => _selectLeft(e.key),
                             child: _PairPill(
                               label: e.value,
                               isSelected: _selectedLeft == e.key,
                               isMatched: isMatched,
-                              // ✅ Sembunyikan label jika sudah matched
                               hideLabel: isMatched,
                             ),
                           );
                         }).toList(),
                       ),
                     ),
-
                     const SizedBox(width: 16),
-
-                    // RIGHT COLUMN
                     Expanded(
                       child: Column(
                         children: _rightWords.asMap().entries.map((e) {
                           final isMatched = _matched.values.contains(e.key);
                           return GestureDetector(
-                            onTap: isMatched ? null : () => _selectRight(e.key),
+                            onTap: isMatched
+                                ? null
+                                : () => _selectRight(e.key),
                             child: _PairPill(
                               label: e.value,
                               isSelected: _selectedRight == e.key,
                               isMatched: isMatched,
-                              // ✅ Sembunyikan label jika sudah matched
                               hideLabel: isMatched,
                             ),
                           );
@@ -679,7 +700,8 @@ class _QuestionCard extends StatelessWidget {
               width: 70,
               height: 70,
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const Icon(Icons.pets, size: 40),
+              errorBuilder: (_, __, ___) =>
+                  const Icon(Icons.pets, size: 40),
             ),
           ),
         ),
@@ -731,7 +753,8 @@ class _QuestionCard extends StatelessWidget {
                   color: Color(0xFFE6F5FE),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.volume_up, size: 20, color: Color(0xFF004D73)),
+                child: const Icon(Icons.volume_up,
+                    size: 20, color: Color(0xFF004D73)),
               ),
             ],
           ),
@@ -752,7 +775,8 @@ class _DashedRectPainter extends CustomPainter {
     const dashWidth = 8.0;
     const dashSpace = 6.0;
     final rrect = RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, size.width, size.height), const Radius.circular(16));
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        const Radius.circular(16));
 
     final path = Path()..addRRect(rrect);
     final pathMetrics = path.computeMetrics();
@@ -760,7 +784,8 @@ class _DashedRectPainter extends CustomPainter {
     for (final pathMetric in pathMetrics) {
       double distance = 0.0;
       while (distance < pathMetric.length) {
-        canvas.drawPath(pathMetric.extractPath(distance, distance + dashWidth), paint);
+        canvas.drawPath(
+            pathMetric.extractPath(distance, distance + dashWidth), paint);
         distance += dashWidth + dashSpace;
       }
     }
@@ -770,6 +795,7 @@ class _DashedRectPainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
+// ✅ FIX UTAMA: width null saat isSelected agar muncul di dalam Row
 class _WordPill extends StatelessWidget {
   final String word;
   final bool isSelected;
@@ -778,13 +804,19 @@ class _WordPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // ✅ width infinity agar mengisi cell GridView
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      // ✅ isSelected (dalam Row horizontal) → auto width
+      // ✅ !isSelected (dalam GridView) → full width
+      width: isSelected ? null : double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isSelected ? const Color(0xFFE6F5FE) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE0E0E0), width: 1.5),
+        border: Border.all(
+          color: isSelected
+              ? const Color(0xFF004D73)
+              : const Color(0xFFE0E0E0),
+          width: 1.5,
+        ),
         boxShadow: [
           if (!isSelected)
             BoxShadow(
@@ -794,22 +826,19 @@ class _WordPill extends StatelessWidget {
             ),
         ],
       ),
-      child: Center(
-        child: Text(
-          word,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
+      child: Text(
+        word,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: isSelected ? const Color(0xFF004D73) : Colors.black87,
         ),
       ),
     );
   }
 }
 
-// ✅ _PairPill ditambah parameter hideLabel
 class _PairPill extends StatelessWidget {
   final String label;
   final bool isSelected;
@@ -830,7 +859,6 @@ class _PairPill extends StatelessWidget {
     Color textColor = Colors.black87;
 
     if (isMatched) {
-      // ✅ Matched: tampil hijau checklist, label disembunyikan
       borderColor = const Color(0xFF1EA36D);
       bgColor = const Color(0xFFEBFFF5);
       textColor = Colors.transparent;
@@ -851,8 +879,8 @@ class _PairPill extends StatelessWidget {
       ),
       child: Center(
         child: isMatched
-            // ✅ Tampilkan checklist icon jika matched
-            ? const Icon(Icons.check_rounded, color: Color(0xFF1EA36D), size: 22)
+            ? const Icon(Icons.check_rounded,
+                color: Color(0xFF1EA36D), size: 22)
             : Text(
                 label,
                 style: TextStyle(
@@ -897,13 +925,19 @@ class _BottomActionArea extends StatelessWidget {
           child: ElevatedButton(
             onPressed: enabled ? onCheck : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: enabled ? const Color(0xFF1EA36D) : const Color(0xFFAFAFAF),
+              backgroundColor: enabled
+                  ? const Color(0xFF1EA36D)
+                  : const Color(0xFFAFAFAF),
               disabledBackgroundColor: const Color(0xFFAFAFAF),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28)),
             ),
             child: Text(
               forceText ?? 'Check',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
           ),
         ),
@@ -911,7 +945,8 @@ class _BottomActionArea extends StatelessWidget {
     }
 
     final isCorrect = checked == true;
-    final color = isCorrect ? const Color(0xFF1EA36D) : const Color(0xFFE23D3D);
+    final color =
+        isCorrect ? const Color(0xFF1EA36D) : const Color(0xFFE23D3D);
     final icon = isCorrect ? Icons.check : Icons.close;
     final title = isCorrect ? 'You did Great!' : 'Wrong';
     final btnText = isCorrect ? 'Continue' : 'Oke';
@@ -941,7 +976,8 @@ class _BottomActionArea extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                decoration:
+                    BoxDecoration(color: color, shape: BoxShape.circle),
                 child: Icon(icon, color: Colors.white, size: 24),
               ),
               const SizedBox(width: 12),
@@ -959,7 +995,8 @@ class _BottomActionArea extends StatelessWidget {
             const SizedBox(height: 16),
             RichText(
               text: TextSpan(
-                style: const TextStyle(fontSize: 16, color: Color(0xFFE23D3D)),
+                style: const TextStyle(
+                    fontSize: 16, color: Color(0xFFE23D3D)),
                 children: [
                   const TextSpan(text: 'Right Answer : '),
                   TextSpan(
@@ -982,11 +1019,15 @@ class _BottomActionArea extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: color,
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28)),
               ),
               child: Text(
                 btnText,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
             ),
           ),
@@ -1022,7 +1063,11 @@ class _LessonCompleteScreen extends StatelessWidget {
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF42E0FF), Color(0xFFF1F9FF), Colors.white],
+                    colors: [
+                      Color(0xFF42E0FF),
+                      Color(0xFFF1F9FF),
+                      Colors.white,
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -1036,7 +1081,9 @@ class _LessonCompleteScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Text('✨ ', style: TextStyle(fontSize: 32, color: Color(0xFFF89B29))),
+                      Text('✨ ',
+                          style: TextStyle(
+                              fontSize: 32, color: Color(0xFFF89B29))),
                       Text(
                         'Lesson Complete!',
                         style: TextStyle(
@@ -1076,8 +1123,10 @@ class _LessonCompleteScreen extends StatelessWidget {
                         petAsset,
                         fit: BoxFit.cover,
                         alignment: Alignment.center,
-                        errorBuilder: (_, __, ___) =>
-                            const Icon(Icons.pets, size: 100, color: Color(0xFFF89B29)),
+                        errorBuilder: (_, __, ___) => const Icon(
+                            Icons.pets,
+                            size: 100,
+                            color: Color(0xFFF89B29)),
                       ),
                     ),
                   ),
@@ -1196,19 +1245,23 @@ class _FinalStatCard extends StatelessWidget {
             child: Icon(icon, color: iconColor, size: 24),
           ),
           const SizedBox(height: 12),
-          Text(label,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF9E9E9E),
-              )),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF9E9E9E),
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(value,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                color: valueColor,
-              )),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: valueColor,
+            ),
+          ),
         ],
       ),
     );
@@ -1223,10 +1276,10 @@ class _HeaderWaveClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(0, size.height - 20);
-    path.quadraticBezierTo(
-        size.width * 0.25, size.height + 10, size.width * 0.5, size.height - 10);
-    path.quadraticBezierTo(
-        size.width * 0.75, size.height - 30, size.width, size.height - 10);
+    path.quadraticBezierTo(size.width * 0.25, size.height + 10,
+        size.width * 0.5, size.height - 10);
+    path.quadraticBezierTo(size.width * 0.75, size.height - 30,
+        size.width, size.height - 10);
     path.lineTo(size.width, 0);
     path.close();
     return path;
@@ -1241,10 +1294,10 @@ class _LessonCompleteWaveClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(0, size.height - 50);
-    path.quadraticBezierTo(
-        size.width * 0.25, size.height + 20, size.width * 0.5, size.height - 20);
-    path.quadraticBezierTo(
-        size.width * 0.75, size.height - 60, size.width, size.height - 10);
+    path.quadraticBezierTo(size.width * 0.25, size.height + 20,
+        size.width * 0.5, size.height - 20);
+    path.quadraticBezierTo(size.width * 0.75, size.height - 60,
+        size.width, size.height - 10);
     path.lineTo(size.width, 0);
     path.close();
     return path;

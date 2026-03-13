@@ -15,12 +15,14 @@ class ProfileScreen extends StatelessWidget {
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding:
-                const EdgeInsets.only(bottom: 120), // Spasi untuk Bottom Nav
+            padding: const EdgeInsets.only(bottom: 120), // Spasi untuk Bottom Nav
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(context),
+                const SizedBox(height: 24),
+                // ── TAMBAHAN: XP CARD ──
+                _buildXpCard(),
                 const SizedBox(height: 24),
                 _buildLanguagesExplored(),
                 const SizedBox(height: 28),
@@ -51,22 +53,19 @@ class ProfileScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.home_filled,
-                        size: 30, color: Colors.black87),
+                    const Icon(Icons.home_filled, size: 30, color: Colors.black87),
                     const Icon(Icons.pets, size: 28, color: Colors.black87),
                     const Icon(Icons.book, size: 28, color: Colors.black87),
                     // Active Profile Button
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
                         color: const Color(0xFFBBE5FB), // Cyan pill background
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Row(
                         children: const [
-                          Icon(Icons.person,
-                              color: Color(0xFF004D73), size: 24),
+                          Icon(Icons.person, color: Color(0xFF004D73), size: 24),
                           SizedBox(width: 8),
                           Text('Profile',
                               style: TextStyle(
@@ -155,8 +154,7 @@ class ProfileScreen extends StatelessWidget {
                           height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(
-                                0xFF6B8AFF), // Warna biru ungu latar belakang avatar
+                            color: const Color(0xFF6B8AFF), // Warna biru ungu latar belakang avatar
                             border: Border.all(color: Colors.white, width: 4),
                             boxShadow: [
                               BoxShadow(
@@ -222,6 +220,83 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  // ── XP CARD (BARU) ──
+  Widget _buildXpCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEDF9F8), // Latar belakang hijau cyan sangat muda
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFFD8EFEA), width: 1.5),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Ikon Piala (Trophy) dengan background lingkaran putih
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.emoji_events,
+                color: Color(0xFFF1B78B), // Warna peach/oranye pastel
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Teks XP dan Progress Bar
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '950 XP',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Custom Progress Bar (Hijau memudar)
+                  Stack(
+                    children: [
+                      Container(
+                        height: 8,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Track
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      FractionallySizedBox(
+                        widthFactor: 0.7, // Asumsi progress sekitar 70%
+                        child: Container(
+                          height: 8,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF218C7E), Color(0xFF5CE1C6)], // Gradasi hijau tua ke hijau muda
+                            ),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ── LANGUAGES EXPLORED ──
   Widget _buildLanguagesExplored() {
     return Padding(
@@ -243,7 +318,7 @@ class ProfileScreen extends StatelessWidget {
               Expanded(
                 child: _StatCard(
                   icon: Icons.book_outlined,
-                  iconColor: Color(0xFFF59B2A),
+                  iconColor: Color(0xFFF89B29),
                   label: 'Region',
                   value: '10',
                 ),
@@ -252,7 +327,7 @@ class ProfileScreen extends StatelessWidget {
               Expanded(
                 child: _StatCard(
                   icon: Icons.star_border_rounded,
-                  iconColor: Color(0xFFF59B2A),
+                  iconColor: Color(0xFFF89B29),
                   label: 'Master',
                   value: '5',
                 ),
@@ -261,7 +336,7 @@ class ProfileScreen extends StatelessWidget {
               Expanded(
                 child: _StatCard(
                   icon: Icons.assignment_outlined,
-                  iconColor: Color(0xFFF59B2A),
+                  iconColor: Color(0xFFF89B29),
                   label: 'Words',
                   value: '2354',
                 ),
@@ -273,57 +348,36 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // ── GUARDIAN COLLECTION ──
+  // ── PET COLLECTION ──
   Widget _buildPetCollection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Pet Collection',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const PetDetailScreen()),
-                ),
-                child: const Text(
-                  'See All',
-                  style: TextStyle(
-                    color: Color(0xFF6B8499),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ],
+          const Text(
+            'Pet Collection',
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: _GuardianCard(
+                child: _PetCard(
                   name: 'Kaba The Buffalo',
                   level: 'Lvl. 12',
                   progress: 0.75,
-                  petAsset:
-                      AppAssets.petAdult, // Sesuaikan ke asset kerbau besar
+                  petAsset: AppAssets.petAdult, // Sesuaikan ke asset kerbau besar
                   bgGlowColor: const Color(0xFFFFF6ED),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _GuardianCard(
+                child: _PetCard(
                   name: 'Oru The Borneo',
                   level: 'Lvl. 12',
                   progress: 0.65,
@@ -356,19 +410,10 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 16),
           // Tile Akun
           _SettingsTile(
-            title: 'Akun',
+            title: 'Account',
             icon: Icons.person_rounded,
             iconBgColor: const Color(0xFFD6EEF8),
             iconColor: const Color(0xFF5C6BC0),
-            onTap: () {},
-          ),
-          const SizedBox(height: 12),
-          // Tile Keamanan
-          _SettingsTile(
-            title: 'Keamanan',
-            icon: Icons.shield_rounded,
-            iconBgColor: const Color(0xFFFFE4D6),
-            iconColor: const Color(0xFFE65100),
             onTap: () {},
           ),
         ],
@@ -418,8 +463,8 @@ class _StatCard extends StatelessWidget {
               Text(
                 label,
                 style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
                   color: Colors.black87,
                 ),
               ),
@@ -443,16 +488,16 @@ class _StatCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// GUARDIAN CARD
+// PET CARD (Disesuaikan dari desain baru)
 // ═══════════════════════════════════════════
-class _GuardianCard extends StatelessWidget {
+class _PetCard extends StatelessWidget {
   final String name;
   final String level;
   final double progress;
   final String petAsset;
   final Color bgGlowColor;
 
-  const _GuardianCard({
+  const _PetCard({
     required this.name,
     required this.level,
     required this.progress,
@@ -501,8 +546,7 @@ class _GuardianCard extends StatelessWidget {
                 Positioned(
                   bottom: -8,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: const Color(0xFFD8F2FF),
                       borderRadius: BorderRadius.circular(12),
@@ -603,8 +647,7 @@ class _SettingsTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: const Color(
-              0xFFF8F9FB), // Warna abu-abu sangat muda (hampir putih)
+          color: const Color(0xFFF8F9FB), // Warna abu-abu sangat muda
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(

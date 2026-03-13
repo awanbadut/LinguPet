@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: const Color(0xFFF5FBFD),
       body: Stack(
         children: [
           IndexedStack(
@@ -75,28 +75,28 @@ class _HomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.only(bottom: 120),
+      padding: const EdgeInsets.only(bottom: 110),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header ──
+          // ── Header Wave ──
           Stack(
             children: [
               ClipPath(
                 clipper: _HeaderWaveClipper(),
                 child: Container(
-                  height: 160,
+                  height: 155,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
                         Color(0xFF42E0FF),
-                        Color(0xFFE8F6FB),
-                        Colors.white
+                        Color(0xFFB8EEF8),
+                        Color(0xFFE8F9FD),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      stops: [0.0, 0.5, 1.0],
+                      stops: [0.0, 0.55, 1.0],
                     ),
                   ),
                 ),
@@ -108,58 +108,57 @@ class _HomeTab extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
-          // ── Your Pet ──
+          // ── Your Pet Section ──
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: _SectionHeader(
               title: 'Your Pet',
               onSeeAll: onPetSeeAll,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: _PetCard(onQuickFeed: onQuickFeed),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
 
-          // ── Learning Track ──
+          // ── Learning Track Section ──
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: _SectionHeader(
               title: 'Learning Track',
               onSeeAll: onLearnSeeAll,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 20),
             child: _LearningTrackCard(
               percent: 0.70,
               color: Color(0xFFFFC107),
               language: 'Javanese',
-              flag: '🇮🇩',
               region: 'West Sumatra, Indonesia',
               topic: 'Topic 2 : Javanese Etiquette 101.',
               note: '3 more words to unlock the next Topic',
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 20),
             child: _LearningTrackCard(
               percent: 0.50,
               color: Color(0xFFEF5350),
               language: 'Javanese',
-              flag: '🇮🇩',
               region: 'West Sumatra, Indonesia',
-              topic: 'Topic 2 : Javanese Etiquette 101.',
+              topic: 'Topic 2 : Javanese Etiquette 101',
               note: '',
             ),
           ),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -175,21 +174,23 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // ── Avatar ──
           Container(
-            width: 44,
-            height: 44,
+            width: 46,
+            height: 46,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
+              border: Border.all(color: Colors.white, width: 2.5),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF42E0FF).withOpacity(0.4),
-                  blurRadius: 10,
+                  color: const Color(0xFF42E0FF).withOpacity(0.5),
+                  blurRadius: 12,
                   spreadRadius: 2,
-                )
+                ),
               ],
             ),
             child: ClipOval(
@@ -204,37 +205,74 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
+
+          // ── Greeting Text ──
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: const [
                 Text(
                   'Welcome Back, Jhon',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
                     color: Color(0xFF05354C),
+                    letterSpacing: 0.1,
                   ),
                 ),
-                SizedBox(height: 2),
+                SizedBox(height: 3),
                 Text(
                   'Keeping the vibes alive, one word at a time.',
-                  style: TextStyle(fontSize: 11, color: Color(0xFF05354C)),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF05354C),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
           ),
+
+          // ── XP Badge ──
           Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: const Color(0xFFDFF5EF),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: const Icon(
-              Icons.notifications_active_rounded,
-              size: 20,
-              color: Color(0xFF05354C),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: const [
+                Text(
+                  '960',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF05354C),
+                    height: 1,
+                  ),
+                ),
+                SizedBox(width: 1),
+                Text(
+                  'xp',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF9E9E9E),
+                    height: 1,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -256,42 +294,54 @@ class _PetCard extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // ── Main Card ──
+        // ── Card Body ──
         Container(
-          margin: const EdgeInsets.only(top: 30),
-          padding: const EdgeInsets.fromLTRB(16, 70, 16, 20),
+          margin: const EdgeInsets.only(top: 28),
+          padding: const EdgeInsets.fromLTRB(16, 68, 16, 20),
           decoration: BoxDecoration(
-            color: const Color(0xFFE8F9FB),
+            color: const Color(0xFFE3F6FA),
             borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF42E0FF).withOpacity(0.12),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ── Name + Level Row ──
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(width: 140),
+                  const SizedBox(width: 138),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Name & Level
                         Row(
                           children: [
                             const Expanded(
                               child: Text(
                                 'Kaba The Buffalo',
                                 style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF1A1A2E),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
+                            const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD6F3FA),
+                                color: const Color(0xFFD0EEF8),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Text(
@@ -299,37 +349,41 @@ class _PetCard extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF6B8499),
+                                  color: Color(0xFF5A7A90),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
+
+                        // ── Flag + Region ──
                         Row(
                           children: [
                             Container(
-                              width: 24,
-                              height: 24,
+                              width: 26,
+                              height: 26,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.white,
                               ),
                               child: const Center(
-                                child: Text('🇮🇩',
-                                    style: TextStyle(fontSize: 16)),
+                                child: Text(
+                                  '🇮🇩',
+                                  style: TextStyle(fontSize: 15),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Column(
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                              children: const [
                                 Text(
                                   'Minang',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF1A1A2E),
                                   ),
                                 ),
                                 Text(
@@ -337,7 +391,7 @@ class _PetCard extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1A1A2E),
+                                    color: Color(0xFF3A3A5C),
                                   ),
                                 ),
                               ],
@@ -349,31 +403,37 @@ class _PetCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+
+              const SizedBox(height: 14),
 
               // ── Chat Bubble ──
               Padding(
-                padding: const EdgeInsets.only(left: 100),
+                padding: const EdgeInsets.only(left: 90),
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
+                          horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
                         color: const Color(0xFF05354C),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Text(
-                        "I'm getting a bit hungry for some Minang words... care to feed me?",
+                        "I'm getting a bit hungry for some Minang\nwords... care to feed me?",
                         style: TextStyle(
-                            fontSize: 11, color: Colors.white, height: 1.4),
+                          fontSize: 11.5,
+                          color: Colors.white,
+                          height: 1.45,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
+                    // Bubble tail (arrow pointing up-left)
                     Positioned(
                       top: -6,
-                      left: 20,
+                      left: 18,
                       child: Transform.rotate(
                         angle: pi / 4,
                         child: Container(
@@ -386,9 +446,10 @@ class _PetCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
 
-              // ── Stats Row ── ✅ FIX: icon sekarang diteruskan ke Row icon
+              const SizedBox(height: 18),
+
+              // ── Stat Cards Row ──
               Row(
                 children: const [
                   Expanded(
@@ -396,7 +457,7 @@ class _PetCard extends StatelessWidget {
                       icon: Icons.apple,
                       iconColor: Color(0xFFF5A623),
                       label: 'Hunger',
-                      percent: 0.85,
+                      percent: 0.15,
                       progressColor: Color(0xFFEF5350),
                     ),
                   ),
@@ -405,8 +466,8 @@ class _PetCard extends StatelessWidget {
                     child: _StatCard(
                       icon: Icons.favorite_border_rounded,
                       iconColor: Color(0xFFF5A623),
-                      label: 'Happiness',
-                      percent: 0.90,
+                      label: 'Hapinnes',
+                      percent: 0.10,
                       progressColor: Color(0xFFEF5350),
                     ),
                   ),
@@ -416,15 +477,16 @@ class _PetCard extends StatelessWidget {
                       icon: Icons.auto_awesome,
                       iconColor: Color(0xFF42E0FF),
                       label: 'Energy',
-                      percent: 0.75,
+                      percent: 0.02,
                       progressColor: Color(0xFFB0BEC5),
                     ),
                   ),
                 ],
               ),
+
               const SizedBox(height: 20),
 
-              // ── Progress Bar ──
+              // ── Progress Label ──
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -432,7 +494,7 @@ class _PetCard extends StatelessWidget {
                     'Progress',
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800,
                       color: Color(0xFF05354C),
                     ),
                   ),
@@ -440,48 +502,58 @@ class _PetCard extends StatelessWidget {
                     '75% to Next Evolution',
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                       color: Color(0xFF9E9E9E),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Stack(
-                children: [
-                  Container(
-                    height: 14,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                  ),
-                  FractionallySizedBox(
-                    widthFactor: 0.75,
-                    child: Container(
+
+              const SizedBox(height: 10),
+
+              // ── Progress Bar ──
+              ClipRRect(
+                borderRadius: BorderRadius.circular(7),
+                child: Stack(
+                  children: [
+                    Container(
                       height: 14,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF89B29),
-                        borderRadius: BorderRadius.circular(7),
+                      width: double.infinity,
+                      color: Colors.white,
+                    ),
+                    FractionallySizedBox(
+                      widthFactor: 0.75,
+                      child: Container(
+                        height: 14,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFFF5A623),
+                              Color(0xFFF89B29),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 22),
 
               // ── Quick Feed Button ──
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: onQuickFeed,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF89B29),
                     elevation: 0,
+                    shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(26),
                     ),
                   ),
                   child: const Text(
@@ -489,7 +561,8 @@ class _PetCard extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
                     ),
                   ),
                 ),
@@ -498,32 +571,32 @@ class _PetCard extends StatelessWidget {
           ),
         ),
 
-        // ── Pet Image Overlap ──
+        // ── Pet Image Floating (top-left overlap) ──
         Positioned(
-          top: -10,
-          left: -10,
+          top: -14,
+          left: -12,
           child: Stack(
             alignment: Alignment.center,
             children: [
               Container(
-                width: 170,
-                height: 170,
+                width: 172,
+                height: 172,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFFFFF6ED),
+                  color: const Color(0xFFFFF3E0),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFF89B29).withOpacity(0.15),
-                      blurRadius: 20,
-                      spreadRadius: 5,
+                      color: const Color(0xFFF89B29).withOpacity(0.18),
+                      blurRadius: 22,
+                      spreadRadius: 6,
                     ),
                   ],
                 ),
               ),
               Image.asset(
                 AppAssets.petBaby,
-                width: 150,
-                height: 150,
+                width: 148,
+                height: 148,
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => const Icon(
                   Icons.pets,
@@ -540,17 +613,17 @@ class _PetCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════
-// STAT CARD ✅ FIX: icon parameter sekarang digunakan
+// STAT CARD
 // ═══════════════════════════════════════════
 class _StatCard extends StatelessWidget {
-  final IconData icon;       // ✅ Tambah parameter icon
+  final IconData icon;
   final Color iconColor;
   final String label;
   final double percent;
   final Color progressColor;
 
   const _StatCard({
-    required this.icon,      // ✅ required
+    required this.icon,
     required this.iconColor,
     required this.label,
     required this.percent,
@@ -560,14 +633,14 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(13),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 5,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
             offset: const Offset(0, 3),
           ),
         ],
@@ -577,15 +650,14 @@ class _StatCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              // ✅ FIX: Gunakan `icon` dari parameter, bukan hardcode
-              Icon(icon, size: 14, color: iconColor),
+              Icon(icon, size: 13, color: iconColor),
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
                   label,
                   style: const TextStyle(
                     fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: Colors.black87,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -593,30 +665,30 @@ class _StatCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Stack(
-            children: [
-              Container(
-                height: 6,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEEEEEE),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-              FractionallySizedBox(
-                widthFactor: percent,
-                child: Container(
+          const SizedBox(height: 9),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: Stack(
+              children: [
+                Container(
                   height: 6,
-                  decoration: BoxDecoration(
-                    color: progressColor,
-                    borderRadius: BorderRadius.circular(3),
+                  width: double.infinity,
+                  color: const Color(0xFFEEEEEE),
+                ),
+                FractionallySizedBox(
+                  widthFactor: percent.clamp(0.0, 1.0),
+                  child: Container(
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: progressColor,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 5),
           Align(
             alignment: Alignment.centerRight,
             child: Text(
@@ -641,7 +713,6 @@ class _LearningTrackCard extends StatelessWidget {
   final double percent;
   final Color color;
   final String language;
-  final String flag;
   final String region;
   final String topic;
   final String note;
@@ -650,7 +721,6 @@ class _LearningTrackCard extends StatelessWidget {
     required this.percent,
     required this.color,
     required this.language,
-    required this.flag,
     required this.region,
     required this.topic,
     required this.note,
@@ -659,49 +729,64 @@ class _LearningTrackCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFFEAF8FA),
+        color: const Color(0xFFE6F7FB),
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // ── Circular Progress ──
           SizedBox(
-            width: 70,
-            height: 70,
+            width: 72,
+            height: 72,
             child: CustomPaint(
-              painter:
-                  _CircularProgressPainter(percent: percent, color: color),
+              painter: _CircularProgressPainter(
+                percent: percent,
+                color: color,
+              ),
               child: Center(
                 child: Text(
                   '${(percent * 100).toInt()}%',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
                     color: color,
                   ),
                 ),
               ),
             ),
           ),
+
           const SizedBox(width: 16),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Language Name
                 Text(
                   language,
                   style: const TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
                     color: Color(0xFF05354C),
                   ),
                 ),
                 const SizedBox(height: 4),
+
+                // Flag + Region
                 Row(
                   children: [
-                    Text(flag, style: const TextStyle(fontSize: 12)),
+                    const Text('🇮🇩', style: TextStyle(fontSize: 12)),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
@@ -718,17 +803,22 @@ class _LearningTrackCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
+
+                // Topic Button
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: const Color(0xFF0B4D6C),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(9),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.menu_book_rounded,
-                          color: Colors.white, size: 14),
+                      const Icon(
+                        Icons.menu_book_rounded,
+                        color: Colors.white,
+                        size: 14,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -745,6 +835,8 @@ class _LearningTrackCard extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                // Note
                 if (note.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Align(
@@ -768,6 +860,9 @@ class _LearningTrackCard extends StatelessWidget {
   }
 }
 
+// ═══════════════════════════════════════════
+// CIRCULAR PROGRESS PAINTER
+// ═══════════════════════════════════════════
 class _CircularProgressPainter extends CustomPainter {
   final double percent;
   final Color color;
@@ -777,17 +872,19 @@ class _CircularProgressPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 4;
+    final radius = (size.width / 2) - 5;
 
+    // Background track
     canvas.drawCircle(
       center,
       radius,
       Paint()
         ..color = Colors.white
-        ..strokeWidth = 8
+        ..strokeWidth = 7
         ..style = PaintingStyle.stroke,
     );
 
+    // Foreground arc
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       -pi / 2,
@@ -795,14 +892,15 @@ class _CircularProgressPainter extends CustomPainter {
       false,
       Paint()
         ..color = color
-        ..strokeWidth = 8
+        ..strokeWidth = 7
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke,
     );
   }
 
   @override
-  bool shouldRepaint(_CircularProgressPainter old) => old.percent != percent;
+  bool shouldRepaint(_CircularProgressPainter old) =>
+      old.percent != percent || old.color != color;
 }
 
 // ═══════════════════════════════════════════
@@ -818,13 +916,14 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           title,
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w900,
-            color: Colors.black87,
+            color: Color(0xFF1A1A2E),
           ),
         ),
         GestureDetector(
@@ -832,7 +931,7 @@ class _SectionHeader extends StatelessWidget {
           child: const Text(
             'See All',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               color: Color(0xFF6B8499),
               decoration: TextDecoration.underline,
               fontWeight: FontWeight.w600,
@@ -856,14 +955,21 @@ class _BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 85,
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+      height: 88,
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
       decoration: const BoxDecoration(
-        color: Color(0xFFE6F5FE),
+        color: Color(0xFFDFF1FB),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
+          topLeft: Radius.circular(32),
+          topRight: Radius.circular(32),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x1A42E0FF),
+            blurRadius: 16,
+            offset: Offset(0, -4),
+          ),
+        ],
       ),
       child: SafeArea(
         top: false,
@@ -887,28 +993,28 @@ class _BottomNav extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: isActive
           ? Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFFBBE5FB),
-                borderRadius: BorderRadius.circular(25),
+                color: const Color(0xFFB3DEFA),
+                borderRadius: BorderRadius.circular(26),
               ),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, color: const Color(0xFF004D73), size: 24),
-                  const SizedBox(width: 8),
+                  Icon(icon, color: const Color(0xFF004D73), size: 22),
+                  const SizedBox(width: 7),
                   Text(
                     label,
                     style: const TextStyle(
                       color: Color(0xFF004D73),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
                     ),
                   ),
                 ],
               ),
             )
-          : Icon(icon, size: 30, color: Colors.black87),
+          : Icon(icon, size: 28, color: const Color(0xFF3A3A4A)),
     );
   }
 }
@@ -919,12 +1025,20 @@ class _BottomNav extends StatelessWidget {
 class _HeaderWaveClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(0, size.height - 30);
-    path.quadraticBezierTo(size.width * 0.25, size.height + 10,
-        size.width * 0.5, size.height - 15);
-    path.quadraticBezierTo(size.width * 0.75, size.height - 40,
-        size.width, size.height - 10);
+    final path = Path();
+    path.lineTo(0, size.height - 28);
+    path.quadraticBezierTo(
+      size.width * 0.25,
+      size.height + 12,
+      size.width * 0.5,
+      size.height - 14,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.75,
+      size.height - 38,
+      size.width,
+      size.height - 8,
+    );
     path.lineTo(size.width, 0);
     path.close();
     return path;
